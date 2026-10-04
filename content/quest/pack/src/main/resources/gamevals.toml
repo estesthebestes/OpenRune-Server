@@ -1,4 +1,6 @@
 [gamevals.synth]
+drink = 2390
+cauldron_bubbling = 2195
 mizgog_placebeads = 1632
 mizgog_beads = 1633
 coffin_close = 53
@@ -69,6 +71,7 @@ restless_ghost_progress = 63702
 imp_catcher_progress = 63703
 misthalin_reflections = 63700
 misthalin_gem_row_slot = 63701
+witchs_potion_progress = 63710
 
 [gamevals.models]
 misthalin_gem_diamond = 32333
