@@ -2,6 +2,7 @@ package org.rsmod.api.game.process.player
 
 import dev.openrune.ServerCacheManager
 import dev.openrune.rscm.RSCM.asRSCM
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
@@ -47,6 +48,22 @@ class RunAutoEnableTest {
         player.setActiveMoveSpeed(MoveSpeed.Run)
         processor.process(player)
         assertFalse(ToggleQueue in player.queueList)
+    }
+
+    @Test
+    fun `energy restores by agility over ten plus fifteen per tick`() {
+        val player = player(threshold = 0, energy = 1_000)
+        processor.process(player)
+        assertEquals(1_000 + 15, player.runEnergy)
+    }
+
+    @Test
+    fun `a delayed player such as one crossing an obstacle regains no energy`() {
+        val player = player(threshold = 0, energy = 1_000)
+        player.processedMapClock = 0
+        player.delay = 5
+        processor.process(player)
+        assertEquals(1_000, player.runEnergy)
     }
 
     private fun player(threshold: Int, energy: Int): Player =

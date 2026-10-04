@@ -46,10 +46,10 @@ public class PlayerRunUpdateProcessor {
         val baseLoss = 60 + (67 * weightKg) / 64
 
         var loss = baseLoss * (300 - agilityLvl) / 300
-        if (hasImprovedStaminaEffect()) {
-            loss = (loss * 85) / 100
-        } else if (hasStaminaEffect()) {
+        if (hasStaminaEffect()) {
             loss = (loss * 30) / 100
+        } else if (hasImprovedStaminaEffect()) {
+            loss = (loss * 85) / 100
         }
 
         runEnergy = max(0, runEnergy - loss)
@@ -71,7 +71,8 @@ public class PlayerRunUpdateProcessor {
     }
 
     private fun Player.restoreRunEnergy() {
-        if (runEnergy >= constants.run_max_energy) {
+        // Delayed players are mid-action (agility obstacles, magic carpets) and regain nothing.
+        if (runEnergy >= constants.run_max_energy || isDelayed) {
             return
         }
         val baseRecover = 15 + (agilityLvl / 10)
