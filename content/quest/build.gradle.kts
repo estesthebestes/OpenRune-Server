@@ -12,5 +12,6 @@ dependencies {
     implementation(projects.api.pluginCommons)
     implementation(projects.api.attr)
     implementation(projects.api.serverConfig)
+    implementation(projects.content.generic.genericLocs)
     implementation(libs.rsprot.api)
 }

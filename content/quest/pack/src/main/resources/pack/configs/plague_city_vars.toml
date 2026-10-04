@@ -1,0 +1,47 @@
+[[varbit]]
+isServerOnly = true
+id = "varbit.plaguecity_progress"
+varp = "varp.elenaquest"
+startBit = 0
+endBit = 4
+
+[[varp]]
+isServerOnly = true
+id = "varp.plaguecity_state"
+scope = "Perm"
+transmit = "Never"
+
+[[varbit]]
+isServerOnly = true
+id = "varbit.plaguecity_buckets_poured"
+varp = "varp.plaguecity_state"
+startBit = 0
+endBit = 2
+
+[[varbit]]
+isServerOnly = true
+id = "varbit.plaguecity_told_to_dig"
+varp = "varp.plaguecity_state"
+startBit = 3
+endBit = 3
+
+[[varbit]]
+isServerOnly = true
+id = "varbit.plaguecity_met_jethick"
+varp = "varp.plaguecity_state"
+startBit = 4
+endBit = 4
+
+[[varbit]]
+isServerOnly = true
+id = "varbit.plaguecity_got_note"
+varp = "varp.plaguecity_state"
+startBit = 5
+endBit = 5
+
+[[varbit]]
+isServerOnly = true
+id = "varbit.plaguecity_read_scroll"
+varp = "varp.plaguecity_state"
+startBit = 6
+endBit = 6

@@ -797,10 +797,6 @@ npc = "npc.headmourner"
 coords = "0_39_51_46_22"
 
 [[spawn]]
-npc = "npc.headmourner_vis"
-coords = "0_39_51_46_22"
-
-[[spawn]]
 npc = "npc.knight_of_ardougne_west"
 coords = "0_39_51_48_60"
 

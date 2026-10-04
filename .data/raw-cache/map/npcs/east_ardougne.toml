@@ -219,10 +219,6 @@ npc = "npc.eaglepeak_zookeeper_charlie"
 coords = "0_40_51_47_0"
 
 [[spawn]]
-npc = "npc.edmond"
-coords = "0_40_52_8_6"
-
-[[spawn]]
 npc = "npc.edmond_top"
 coords = "0_40_52_8_6"
 
