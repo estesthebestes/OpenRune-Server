@@ -1,0 +1,4 @@
+[[object]]
+id = "loc.fai_varrock_posh_sink"
+inherit = "loc.fai_varrock_posh_sink"
+contentGroup = "content.water_source"

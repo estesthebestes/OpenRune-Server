@@ -63,12 +63,16 @@ restless_ghost_return_tile = 63704
 misthalin_return_tile = 63700
 misthalin_mirror_blocker = 63701
 misthalin_puzzle_state = 63702
+demon_slayer_state = 63800
 
 [gamevals.varbit]
 restless_ghost_progress = 63702
 imp_catcher_progress = 63703
 misthalin_reflections = 63700
 misthalin_gem_row_slot = 63701
+demon_slayer_bones_given = 63801
+demon_slayer_traiborn_asked = 63802
+demon_slayer_traiborn_key_given = 63803
 
 [gamevals.models]
 misthalin_gem_diamond = 32333
@@ -81,3 +85,9 @@ misthalin_gem_emerald = 32334
 [gamevals.timer]
 restless_ghost_coffin_ghost = 123
 restless_skeleton_attack = 124
+
+[gamevals.area]
+demon_slayer_stone_circle = 63800
+
+[gamevals.queue]
+demonslayer_delrith_timeout = 63800

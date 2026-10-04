@@ -1,0 +1,26 @@
+[[varp]]
+isServerOnly = true
+id = "varp.demon_slayer_state"
+scope = "Perm"
+transmit = "Never"
+
+[[varbit]]
+isServerOnly = true
+id = "varbit.demon_slayer_bones_given"
+varp = "varp.demon_slayer_state"
+startBit = 0
+endBit = 4
+
+[[varbit]]
+isServerOnly = true
+id = "varbit.demon_slayer_traiborn_asked"
+varp = "varp.demon_slayer_state"
+startBit = 5
+endBit = 5
+
+[[varbit]]
+isServerOnly = true
+id = "varbit.demon_slayer_traiborn_key_given"
+varp = "varp.demon_slayer_state"
+startBit = 6
+endBit = 6
