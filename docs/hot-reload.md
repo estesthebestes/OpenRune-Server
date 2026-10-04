@@ -38,7 +38,8 @@ does **not** work: the next autosave writes the in-memory value back.
 | `drops` | `content/drops/src/main/resources/drops/tables` | every TOML drop table (Kotlin `@RegisterDropTable` tables are kept) |
 | `shootingstars` | `content/events/shooting-stars/src/main/resources/shootingstars.toml` | intervals and teleports (`is_enabled` needs a restart) |
 | `spawns` | `.data/raw-cache/map/{npcs,objs}` | map npc and ground item spawns, applied as a diff |
-| `types` | `.data/cache/SERVER` | server-only npc/item/loc/inv fields: stats, params (incl. woodcutting rates, shop links), costs, shop stock |
+| `types` | `.data/cache/SERVER` | server-only npc/item/loc/inv fields: stats, params (incl. woodcutting rates, shop links), costs, shop stock, loc content groups (doors, gates) |
+| `typesrc` | `.data/raw-cache/server/**`, `content/**/pack/.../configs` | watch-only: rebuilds the cache, then applies `types` (same as `::reload types build`) |
 | `shops` | — | resets every opened shared shop to its configured stock |
 | `code` | `content/**` and `api/**` build output | recompiled classes; see "Fixing content live" |
 
@@ -55,7 +56,10 @@ hot-reload:
 ```
 
 With `watch: true`, saving `game.yml`, a drop table, a spawn file or the shooting star settings
-reloads it automatically. A finished `buildCache` reloads `types` (3 s quiet period), and with
+reloads it automatically. Saving type data (for example a door entry in
+`.data/raw-cache/server/loc/*.toml`, npc stats or shop stock) rebuilds the cache and applies it
+(`typesrc`, 2 s quiet period, about a minute for the build). A finished `buildCache` reloads
+`types` (3 s quiet period), and with
 `code: true` every compile of a content or api module is hot swapped (1 s quiet period). These
 settings themselves need a restart.
 
@@ -77,7 +81,8 @@ see `game.example.yml` for every key. Highlights:
 `::reload types` copies only fields the client never sees. Each reload lists anything it skipped:
 
 - **Copied:** npc combat stats, hunt/wander/attack ranges, respawn rate, regen rate, params; item
-  costs, weight, tradeability, params; loc params; shop stock, flags and (shared shops) size.
+  costs, weight, tradeability, params; loc params and content groups (so a loc can become a door,
+  gate or any other content-driven interactable live); shop stock, flags and (shared shops) size.
 - **Needs a restart (and a client cache update):** names, options, models and animations, sizes,
   collision, new ids, inventory scope, weapon categories.
 - Npcs in the world get new stats immediately when they are idle and unharmed; others on respawn.

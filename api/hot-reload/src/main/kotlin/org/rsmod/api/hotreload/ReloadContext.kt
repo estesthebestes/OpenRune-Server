@@ -18,6 +18,9 @@ public class ReloadContext(
 ) {
     public fun <T> awaitDb(timeout: Duration = 30.seconds, query: (DatabaseConnection) -> T): T =
         db.query(timeout, query)
+
+    public fun withOptions(extra: Set<String>): ReloadContext =
+        ReloadContext(requesters, options + extra, db)
 }
 
 public interface ReloadDatabase {
