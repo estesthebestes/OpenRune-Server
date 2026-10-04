@@ -20,6 +20,7 @@ import org.rsmod.api.script.onOpLoc3
 import org.rsmod.api.script.onOpLoc4
 import org.rsmod.api.script.onOpLoc5
 import org.rsmod.api.stats.xpmod.XpModifiers
+import org.rsmod.content.other.pets.PetRewards
 import org.rsmod.content.quest.manager.QuestRequirements
 import org.rsmod.game.entity.Player
 import org.rsmod.game.hit.HitType
@@ -41,7 +42,11 @@ private data class Binding(
 
 class AgilityObstacles
 @Inject
-constructor(private val objRepo: ObjRepository, private val xpMods: XpModifiers) : PluginScript() {
+constructor(
+    private val objRepo: ObjRepository,
+    private val xpMods: XpModifiers,
+    private val petRewards: PetRewards,
+) : PluginScript() {
     override fun ScriptContext.startup() {
         val bindings = LinkedHashMap<String, MutableList<Binding>>()
         for ((courseIndex, course) in AgilityCourses.courses.withIndex()) {
@@ -319,7 +324,9 @@ constructor(private val objRepo: ObjRepository, private val xpMods: XpModifiers)
         player.agilityProgress = 0
         statAdvance(STAT_AGILITY, course.lapXp * xpMods.get(player, STAT_AGILITY))
         rollMark(course)
-        with(SquirrelPet) { rollSquirrel(course) }
+        if (course.petBase > 0) {
+            petRewards.rollSkillingPet(player, SQUIRREL_PET, STAT_AGILITY, course.petBase)
+        }
     }
 
     /**

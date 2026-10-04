@@ -9,6 +9,7 @@ import org.rsmod.map.CoordGrid
 
 internal const val STAT_AGILITY: String = "stat.agility"
 internal const val MARK_OF_GRACE: String = "obj.grace"
+internal const val SQUIRREL_PET: String = "obj.skillpetagility"
 internal const val VARP_COURSE: String = "varp.agility_course"
 internal const val VARP_PROGRESS: String = "varp.agility_course_progress"
 internal const val VARP_MARK_CLOCK: String = "varp.agility_mark_clock"
