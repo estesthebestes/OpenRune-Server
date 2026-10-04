@@ -1,0 +1,6 @@
+id = "Alomone Drops"
+npcs = ["npc.alomone_hazeel_cultist", "npc.alomone_hazeel_cultist_2op"]
+
+[[guaranteed]]
+obj = "obj.bones"
+count = 1

@@ -1,0 +1,17 @@
+[[npc]]
+id = "npc.alomone_hazeel_cultist"
+inherit = "npc.alomone_hazeel_cultist"
+[npc.params]
+"param.attack_anim" = "seq.human_blunt_pound"
+"param.npc_attack_type" = "category.attacktype_crush"
+"param.attack_sound" = 2567
+"param.defend_anim" = "seq.human_blunt_block"
+
+[[npc]]
+id = "npc.alomone_hazeel_cultist_2op"
+inherit = "npc.alomone_hazeel_cultist_2op"
+[npc.params]
+"param.attack_anim" = "seq.human_blunt_pound"
+"param.npc_attack_type" = "category.attacktype_crush"
+"param.attack_sound" = 2567
+"param.defend_anim" = "seq.human_blunt_block"
