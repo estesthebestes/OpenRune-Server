@@ -51,17 +51,17 @@ public class HeldUInteractions @Inject constructor(private val eventBus: EventBu
         targetItemServerType: ItemServerType,
         targetSlot: Int,
     ) {
-        val firstCombination =
-            opTrigger(selectedItemServerType, selectedSlot, targetItemServerType, targetSlot)
-        if (firstCombination != null) {
-            eventBus.publish(this, firstCombination)
-            return
-        }
-
-        val secondCombination =
-            opTrigger(targetItemServerType, targetSlot, selectedItemServerType, selectedSlot)
-        if (secondCombination != null) {
-            eventBus.publish(this, secondCombination)
+        // A script written for the exact pair beats a "use this obj on anything" fallback, whichever
+        // of the two objs the player used on the other.
+        val selected = selectedItemServerType
+        val target = targetItemServerType
+        val trigger =
+            pairTrigger(selected, selectedSlot, target, targetSlot)
+                ?: pairTrigger(target, targetSlot, selected, selectedSlot)
+                ?: defaultTrigger(selected, selectedSlot, target, targetSlot)
+                ?: defaultTrigger(target, targetSlot, selected, selectedSlot)
+        if (trigger != null) {
+            eventBus.publish(this, trigger)
             return
         }
 
@@ -72,7 +72,7 @@ public class HeldUInteractions @Inject constructor(private val eventBus: EventBu
         }
     }
 
-    private fun opTrigger(
+    private fun pairTrigger(
         first: ItemServerType,
         firstSlot: Int,
         second: ItemServerType,
@@ -93,6 +93,15 @@ public class HeldUInteractions @Inject constructor(private val eventBus: EventBu
             return contentScript
         }
 
+        return null
+    }
+
+    private fun defaultTrigger(
+        first: ItemServerType,
+        firstSlot: Int,
+        second: ItemServerType,
+        secondSlot: Int,
+    ): SuspendEvent<ProtectedAccess>? {
         val defaultTypeScript = HeldUDefaultEvents.Type(first, firstSlot, second, secondSlot)
         if (eventBus.contains(defaultTypeScript::class.java, defaultTypeScript.id)) {
             return defaultTypeScript
