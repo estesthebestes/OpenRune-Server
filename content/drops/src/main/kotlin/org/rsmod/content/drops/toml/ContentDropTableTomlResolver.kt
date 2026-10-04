@@ -16,6 +16,7 @@ import org.rsmod.content.drops.clueScrollTransformObj
 import org.rsmod.content.drops.shouldDropBrimstoneKey
 import org.rsmod.content.drops.shouldDropLootingBag
 import org.rsmod.content.drops.tables.shared.SharedDropTables
+import org.rsmod.content.quest.manager.Quest
 import org.rsmod.content.quest.manager.QuestRequirement
 import org.rsmod.content.quest.manager.QuestRequirementResolver
 import org.rsmod.game.entity.Player
@@ -57,8 +58,10 @@ constructor(
                     "not_completed" -> { player ->
                         questRequirements.satisfies(player, quest, QuestRequirement.NotCompleted)
                     }
+                    // Quest-item drops follow real progress: under "assume-completed" no quest is
+                    // ever in progress, which would stop them dropping for players on the quest.
                     "during", null -> { player ->
-                        questRequirements.satisfies(player, quest, QuestRequirement.InProgress)
+                        Quest.get(quest)?.isQuestInProgress(player) == true
                     }
                     else ->
                         error(
