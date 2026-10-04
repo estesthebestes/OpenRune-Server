@@ -141,11 +141,11 @@ constructor(
         }
 
         onCommand("npc", "Spawn npc", ::npcAdd) {
-            invalidArgs = "Use as ::npc duration npcDebugNameOrId (ex: 100 prison_pete)"
+            invalidArgs = "Use as ::npc duration npcDebugNameOrId (ex: 100 prisonpete_pete)"
         }
 
         onCommand("npcadd", "Spawn npc", ::npcAdd) {
-            invalidArgs = "Use as ::npcadd duration npcDebugNameOrId (ex: 100 prison_pete)"
+            invalidArgs = "Use as ::npcadd duration npcDebugNameOrId (ex: 100 prisonpete_pete)"
         }
 
         onCommand("npcgrid", "Spawn a 3x3 grid of immobile npcs", ::npcGrid) {

@@ -1,5 +1,6 @@
 package org.rsmod.content.bosses.gemstonecrab
 
+import dev.or2.central.account.Rights
 import jakarta.inject.Inject
 import org.rsmod.api.game.process.GameLifecycle
 import org.rsmod.api.player.output.mes
@@ -34,6 +35,7 @@ constructor(
 
         onCommand("gemstonecrab") {
             desc = "Force the active gemstone crab to burrow immediately"
+            requiredRights = Rights.ADMINISTRATOR
             cheat { crab.forceBurrow() }
         }
 
