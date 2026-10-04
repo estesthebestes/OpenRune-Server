@@ -2,6 +2,7 @@ package dev.openrune.rscm
 
 import dev.openrune.definition.constants.ConstantProvider
 import dev.openrune.rscm.RSCMType.Companion.RSCM_PREFIXES
+import java.util.concurrent.ConcurrentHashMap
 
 enum class RSCMType(val prefix: String) {
     AREA("area"),
@@ -47,9 +48,7 @@ enum class RSCMType(val prefix: String) {
     companion object {
         val RSCM_PREFIXES = entries.map { it.prefix }.toSet()
     }
-
 }
-
 
 object RSCM {
 
@@ -58,8 +57,8 @@ object RSCM {
     // O(1) prefix validation instead of scanning with startsWith
     private val PREFIX_SET = RSCM_PREFIXES.toHashSet()
 
-    // Cache for resolved mappings
-    private val cache = HashMap<String, Int>(1024)
+    // Concurrent because hot-reload parsing resolves symbols off the game thread.
+    private val cache = ConcurrentHashMap<String, Int>(1024)
 
     fun getRSCM(entity: Array<String>): List<Int> = entity.map { getRSCM(it) }
 

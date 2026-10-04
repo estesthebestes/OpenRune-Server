@@ -72,9 +72,14 @@ data class NpcServerType(
     var huntRange: Int = 5,
     var huntMode: Int? = null,
     var giveChase: Boolean = true,
-    @param:TomlField(["params"],serializer = ParamSerializer::class)
+    @param:TomlField(["params"], serializer = ParamSerializer::class)
     var paramsRaw: MutableMap<Int, Any>? = null,
 ) : Definition {
+
+    /** Identity is the id so types stay usable as map keys when hot reload edits them in place. */
+    override fun equals(other: Any?): Boolean = other is NpcServerType && other.id == id
+
+    override fun hashCode(): Int = id
 
     val internalName: String
         get() = RSCM.getReverseMapping(RSCMType.NPC, id)

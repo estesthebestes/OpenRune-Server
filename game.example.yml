@@ -17,6 +17,49 @@ gameplay:
     mode: "assume-completed"
     virtual-completions: []
     virtual-lines: []
+  # Everything below is live-reloadable with `::reload config`. Defaults match OSRS.
+  xp:
+    # Per-skill XP multipliers, stacked on each player's personal rate and the realm global rate.
+    skill-multipliers: {}            # e.g. { prayer: 5.0, woodcutting: 2.0 }
+  regen:
+    health-interval-ticks: 100       # 100 ticks is about 60 seconds
+    health-amount: 1                 # the regen bracelet still doubles this
+    stat-restore-interval-ticks: 100 # drained stats recover toward base
+    boost-decay-interval-ticks: 100  # boosted stats decay toward base
+    run-restore-multiplier: 1.0
+    run-drain-multiplier: 1.0
+    prayer-drain-multiplier: 1.0
+    prayer-regen-amount: 0           # custom passive prayer regen per stat-restore tick (0 = off)
+    special-attack-interval-ticks: 50
+    special-attack-amount: 100       # 100 = 10% of the special attack bar
+    npc-regen-multiplier: 1.0
+  skilling:
+    success-multiplier: 1.0          # chance of each gather/craft roll succeeding
+    resource-respawn-multiplier: 1.0 # below 1 = trees and rocks come back faster
+    resource-deplete-multiplier: 1.0 # below 1 = trees and rocks deplete less often
+  combat:
+    player-damage-multiplier: 1.0    # player max hit against NPCs (PvP is unaffected)
+    npc-damage-multiplier: 1.0       # NPC max hit against players
+    npc-aggression: true
+  world:
+    npc-respawn-multiplier: 1.0
+    loot-visible-ticks: 200          # how long NPC drops stay private to the killer
+    shop-restock-multiplier: 1.0     # below 1 = shops restock faster
+  # Scheduled events stack on top of the values above while active.
+  events: []
+  #  - name: "Double XP Weekend"
+  #    start: "2026-10-10 00:00"
+  #    end: "2026-10-12 23:59"
+  #    global-xp: 2.0
+  #    drop-multiplier: 1.0
+  #    skill-multipliers: {}
+
+# Hot reload: `::reload` lists targets. Changing these settings needs a restart.
+hot-reload:
+  watch: false        # reload targets automatically shortly after their files are saved
+  debounce-ms: 500
+  code: false         # dev only: enables ::hotswap for compiled content modules
+  paths: {}           # per-target source overrides, e.g. { drops: "./my-drops" }
 
 central:
   same-instance: true

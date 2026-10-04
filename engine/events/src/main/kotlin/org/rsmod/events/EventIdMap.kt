@@ -11,6 +11,16 @@ public sealed class EventIdMap<K, V> : EventMap<K, MutableMap<Long, V>>() {
         return events.getOrPut(type) { defaultMap() }
     }
 
+    @Suppress("UNCHECKED_CAST")
+    internal fun removeIfSame(type: Class<*>, key: Long, action: Any): Boolean {
+        val idMap = events[type as Class<out K>] ?: return false
+        if (idMap[key] !== action) {
+            return false
+        }
+        idMap.remove(key)
+        return true
+    }
+
     private fun defaultMap(): Long2ObjectOpenHashMap<V> {
         return Long2ObjectOpenHashMap<V>().apply { defaultReturnValue(null) }
     }

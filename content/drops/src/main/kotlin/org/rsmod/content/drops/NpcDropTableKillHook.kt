@@ -10,7 +10,7 @@ import dtx.core.with
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import org.rsmod.api.area.checker.AreaChecker
-import org.rsmod.api.config.constants
+import org.rsmod.api.config.rates.GameplayRates
 import org.rsmod.api.death.NpcDeathDropContext
 import org.rsmod.api.death.NpcDeathDropHook
 import org.rsmod.api.death.NpcDeathKillContext
@@ -42,7 +42,7 @@ constructor(
         val table = registry.forNpc(context.npc, areaChecker) ?: return
 
         val player = context.hero
-        val duration = player.lootDropDuration ?: constants.lootdrop_duration
+        val duration = player.lootDropDuration ?: GameplayRates.current.lootVisibleTicks
         val dropCoords = context.dropCoords
 
         val npc = context.npc

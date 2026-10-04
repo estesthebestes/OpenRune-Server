@@ -3,6 +3,8 @@ package org.rsmod.content.interfaces.prayer.tab.scripts
 import jakarta.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
+import org.rsmod.api.config.rates.GameplayRates
 import org.rsmod.api.player.bonus.WornBonuses
 import org.rsmod.api.player.disablePrayers
 import org.rsmod.api.player.output.mes
@@ -45,7 +47,7 @@ constructor(private val repo: PrayerRepository, private val bonuses: WornBonuses
         }
 
         val drainEffect = calculateDrainEffect(enabledPrayers)
-        drainCounter += drainEffect
+        drainCounter += scaledDrain(drainEffect)
 
         val cappedResistance = max(1, drainResistance)
         val prayerPointCost = (drainCounter - 1) / cappedResistance
@@ -68,6 +70,11 @@ constructor(private val repo: PrayerRepository, private val bonuses: WornBonuses
             }
         }
         return drainEffect
+    }
+
+    private fun scaledDrain(drainEffect: Int): Int {
+        val multiplier = GameplayRates.current.prayerDrainMultiplier
+        return if (multiplier == 1.0) drainEffect else (drainEffect * multiplier).roundToInt()
     }
 
     private fun Player.triggerPrayerDepletion() {

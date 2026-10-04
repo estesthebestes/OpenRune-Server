@@ -11,6 +11,7 @@ import org.rsmod.api.config.Constants
 import org.rsmod.api.config.locParam
 import org.rsmod.api.config.locXpParam
 import org.rsmod.api.config.objParam
+import org.rsmod.api.config.rates.GameplayRates
 import org.rsmod.api.config.refs.params
 import org.rsmod.api.controller.vars.intVarCon
 import org.rsmod.api.player.events.skilling.SkillingProduct
@@ -131,7 +132,7 @@ constructor(
             treeSwingDespawnTick(tree, type)
             despawn = cutLogs && isTreeDespawnRequired(tree)
         } else {
-            despawn = cutLogs && random.of(1, 255) > type.treeDepleteChance
+            despawn = cutLogs && rollDeplete(type)
         }
 
         if (cutLogs) {
@@ -153,7 +154,8 @@ constructor(
         }
 
         if (despawn) {
-            val respawnTime = type.resolveRespawnTime(random)
+            val multiplier = GameplayRates.current.resourceRespawnMultiplier
+            val respawnTime = GameplayRates.scaleTicks(type.resolveRespawnTime(random), multiplier)
             locRepo.change(tree, type.treeStump, respawnTime)
             resetAnim()
             soundSynth("synth.tree_fall_sound")
@@ -218,7 +220,20 @@ constructor(
 
     private fun isTreeDespawnRequired(tree: BoundLocInfo): Boolean {
         val controller = conRepo.findExact(tree.coords, "controller.woodcutting_tree_duration")
-        return controller != null && controller.treeActivelyCutTicks >= controller.durationStart
+        if (controller == null) {
+            return false
+        }
+        val multiplier = GameplayRates.current.resourceDepleteMultiplier
+        return controller.treeActivelyCutTicks * multiplier >= controller.durationStart
+    }
+
+    private fun ProtectedAccess.rollDeplete(type: ObjectServerType): Boolean {
+        val multiplier = GameplayRates.current.resourceDepleteMultiplier
+        if (multiplier == 1.0) {
+            return random.of(1, 255) > type.treeDepleteChance
+        }
+        val baseChance = (255 - type.treeDepleteChance).coerceIn(0, 255) / 255.0
+        return random.randomDouble() < (baseChance * multiplier).coerceIn(0.0, 1.0)
     }
 
     private fun sendLocalOverlayLoc(tree: BoundLocInfo, type: ObjectServerType, respawnTime: Int) {

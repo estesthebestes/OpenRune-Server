@@ -202,7 +202,17 @@ object SlayerTaskManager {
     fun isSuperiorForTask(type: NpcServerType, taskId: Int): Boolean =
         superiorNpcIdsByTaskId[taskId]?.contains(type.id) == true
 
-    private val superiorNpcIdsByTaskId: Map<Int, Set<Int>> by lazy { buildSuperiorNpcIdsByTask() }
+    @Volatile private var superiorNpcIdsByTaskIdCache: Map<Int, Set<Int>>? = null
+
+    private val superiorNpcIdsByTaskId: Map<Int, Set<Int>>
+        get() =
+            superiorNpcIdsByTaskIdCache
+                ?: buildSuperiorNpcIdsByTask().also { superiorNpcIdsByTaskIdCache = it }
+
+    /** Drops indexes built from npc params so they rebuild after a `::reload types`. */
+    fun invalidateTypeIndexes() {
+        superiorNpcIdsByTaskIdCache = null
+    }
 
     private fun buildSuperiorNpcIdsByTask(): Map<Int, Set<Int>> {
         val map = mutableMapOf<Int, MutableSet<Int>>()

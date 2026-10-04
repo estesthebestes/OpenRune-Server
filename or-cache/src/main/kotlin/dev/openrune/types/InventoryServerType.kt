@@ -22,6 +22,11 @@ data class InventoryServerType(
     var stock: List<InvStock> = emptyList(),
 ) : Definition {
 
+    /** Identity is the id so types stay usable as map keys when hot reload edits them in place. */
+    override fun equals(other: Any?): Boolean = other is InventoryServerType && other.id == id
+
+    override fun hashCode(): Int = id
+
     public val restock: Boolean
         get() = flags and RESTOCK_FLAG != 0
 
@@ -100,8 +105,10 @@ public enum class InvStackType(public val id: Int) {
 public enum class InvScope(public val id: Int) {
     /** Temporary inventories that do not save. (e.g., clue scrolls) */
     Temp(0),
+
     /** Persistent inventories that will save. (e.g., bank) */
     Perm(1),
+
     /** Global Inventories that are shared. (e.g., shops) */
     Shared(2),
 }

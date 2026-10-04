@@ -8,6 +8,7 @@ import dev.openrune.types.SequenceServerType
 import dev.openrune.types.aconverted.SpotanimType
 import dev.openrune.types.aconverted.SynthType
 import jakarta.inject.Inject
+import kotlin.math.max
 import kotlin.math.min
 import org.rsmod.api.combat.commons.CombatAttack
 import org.rsmod.api.combat.commons.fx.MeleeAnimationAndSound
@@ -28,6 +29,7 @@ import org.rsmod.api.combat.commons.types.MeleeAttackType
 import org.rsmod.api.combat.commons.types.RangedAttackType
 import org.rsmod.api.combat.formulas.AccuracyFormulae
 import org.rsmod.api.combat.formulas.MaxHitFormulae
+import org.rsmod.api.config.rates.GameplayRates
 import org.rsmod.api.config.refs.params
 import org.rsmod.api.death.PvPPlayerHitHook
 import org.rsmod.api.npc.hit.isStyleImmuneTo
@@ -648,7 +650,14 @@ constructor(
     ): Int {
         return when (target) {
             is Npc ->
-                calculateMeleeMaxHit(source, target, attackType, attackStyle, multiplier, roundUp)
+                calculateMeleeMaxHit(
+                    source,
+                    target,
+                    attackType,
+                    attackStyle,
+                    multiplier * pvnDamageMultiplier,
+                    roundUp,
+                )
             is Player ->
                 calculateMeleeMaxHit(source, target, attackType, attackStyle, multiplier, roundUp)
         }
@@ -926,7 +935,7 @@ constructor(
                     target = target,
                     attackType = attackType,
                     attackStyle = attackStyle,
-                    specMultiplier = multiplier,
+                    specMultiplier = multiplier * pvnDamageMultiplier,
                     boltSpecDamage = boltSpecDamage,
                 )
             is Player ->
@@ -1279,14 +1288,15 @@ constructor(
         when (target) {
             is Npc ->
                 calculateSpellMaxHit(
-                    source = source,
-                    target = target,
-                    spell = spell,
-                    spellbook = spellbook,
-                    baseMaxHit = baseMaxHit,
-                    attackRate = attackRate,
-                    sunfireRune = sunfireRune,
-                )
+                        source = source,
+                        target = target,
+                        spell = spell,
+                        spellbook = spellbook,
+                        baseMaxHit = baseMaxHit,
+                        attackRate = attackRate,
+                        sunfireRune = sunfireRune,
+                    )
+                    .scaledForPvn()
             is Player ->
                 calculateSpellMaxHit(
                     source = source,
@@ -1433,9 +1443,23 @@ constructor(
         multiplier: Double,
     ): Int {
         return when (target) {
-            is Npc -> calculateSpellMaxHit(source, target, baseMaxHit, multiplier)
+            is Npc ->
+                calculateSpellMaxHit(source, target, baseMaxHit, multiplier * pvnDamageMultiplier)
             is Player -> calculateSpellMaxHit(source, target, baseMaxHit, multiplier)
         }
+    }
+
+    private val pvnDamageMultiplier: Double
+        get() = GameplayRates.current.playerDamageMultiplier
+
+    private fun IntRange.scaledForPvn(): IntRange {
+        val multiplier = pvnDamageMultiplier
+        if (multiplier == 1.0) {
+            return this
+        }
+        val low = (first * multiplier).toInt()
+        val high = max(low, (last * multiplier).toInt())
+        return low..high
     }
 
     private fun calculateSpellMaxHit(

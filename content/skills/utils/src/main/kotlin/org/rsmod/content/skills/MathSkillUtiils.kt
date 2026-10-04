@@ -1,13 +1,13 @@
 import kotlin.math.floor
 import kotlin.random.Random
+import org.rsmod.api.config.rates.GameplayRates
 
-private val STATIC_RANDOM = Random.Default  // shared instance
+private val STATIC_RANDOM = Random.Default // shared instance
 
 fun skillSuccess(low: Int, high: Int, level: Int): Boolean {
     val rate = computeSkillingSuccess(low, high, level)
-    return rate > STATIC_RANDOM.nextDouble()
+    return rate * GameplayRates.current.skillingSuccessMultiplier > STATIC_RANDOM.nextDouble()
 }
-
 
 /**
  * Computes the skilling success probability using the Old School RuneScape skilling success formula.

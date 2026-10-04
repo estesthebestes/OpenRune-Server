@@ -30,6 +30,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.rsmod.api.game.process.PluginScriptBootGate
 import org.rsmod.api.repo.EntityDelayedProcess
+import org.rsmod.api.repo.map.MapSpawnRegistry
+import org.rsmod.api.repo.map.NpcSpawnKey
+import org.rsmod.api.repo.map.ObjSpawnKey
 import org.rsmod.api.repo.npc.NpcRepository
 import org.rsmod.api.repo.obj.ObjRepository
 import org.rsmod.api.server.config.ServerConfig
@@ -39,10 +42,11 @@ import org.rsmod.game.obj.Obj
 import org.rsmod.game.obj.ObjEntity
 import org.rsmod.game.obj.ObjScope
 import org.rsmod.map.CoordGrid
+import org.rsmod.plugin.loader.ExternalPluginLoader
 import org.rsmod.plugin.module.PluginModule
+import org.rsmod.plugin.scripts.LoadedPluginScripts
 import org.rsmod.plugin.scripts.PluginScript
 import org.rsmod.plugin.scripts.ScriptContext
-import org.rsmod.plugin.loader.ExternalPluginLoader
 import org.rsmod.server.install.GameNetworkRsaGenerator
 import org.rsmod.server.install.GameServerLogbackCopy
 import org.rsmod.server.shared.loader.PluginModuleLoader
@@ -117,6 +121,7 @@ class GameServer(private val skipTypeVerificationOverride: Boolean? = null) :
         val or2cache =
             timedPhase(phases, "cache") { ServerCacheManager.init(serverConfig.revision) }
         timedPhase(phases, "map") { loadMap(or2cache, injector) }
+        or2cache.close()
         if (phases == null) {
             loadScripts(injector)
         }
@@ -132,12 +137,14 @@ class GameServer(private val skipTypeVerificationOverride: Boolean? = null) :
         logger.info { "Loading game map and collision flags..." }
         val npcRepo = injector.getInstance(NpcRepository::class.java)
         val objRepo = injector.getInstance(ObjRepository::class.java)
+        val mapSpawns = injector.getInstance(MapSpawnRegistry::class.java)
 
         val sink =
             object : GameMapSpawnSink {
                 override fun onNpcSpawn(def: MapNpcDefinition, coords: CoordGrid) {
                     val type = ServerCacheManager.getNpc(def.id) ?: return
                     val npc = Npc(type, coords)
+                    mapSpawns.recordNpc(NpcSpawnKey(type.id, coords), npc)
                     npcRepo.addDelayed(npc, spawnDelay = 0, duration = Int.MAX_VALUE)
                 }
 
@@ -145,6 +152,7 @@ class GameServer(private val skipTypeVerificationOverride: Boolean? = null) :
                     val type =
                         ServerCacheManager.getItem(def.id)
                             ?: error("Invalid obj type: $def ($coords)")
+                    mapSpawns.recordObj(ObjSpawnKey(type.id, def.count, coords))
                     val entity =
                         ObjEntity(type.id, count = def.count, scope = ObjScope.Perm.id)
                     val obj =
@@ -158,7 +166,9 @@ class GameServer(private val skipTypeVerificationOverride: Boolean? = null) :
                 }
             }
 
-        GameMapDecoder.decodeAll(sink, or2cache)
+        GameMapDecoder.decodeAll(sink, or2cache) { squares ->
+            mapSpawns.loadedSquares = squares.mapTo(hashSetOf()) { it.id }
+        }
 
         val locZoneStorage = injector.getInstance(LocZoneStorage::class.java)
         logger.info {
@@ -239,7 +249,8 @@ class GameServer(private val skipTypeVerificationOverride: Boolean? = null) :
     }
 
     private fun startupPluginScript(script: PluginScript, context: ScriptContext) {
-        with(script) { context.startup() }
+        context.withOwner(script) { with(script) { context.startup() } }
+        LoadedPluginScripts.add(script)
     }
 
     private inline fun <T> timedPhase(

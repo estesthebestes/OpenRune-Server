@@ -6,7 +6,7 @@ import dev.openrune.rscm.RSCM.asRSCM
 import dev.openrune.rscm.RSCMType
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
-import org.rsmod.api.config.constants
+import org.rsmod.api.config.rates.GameplayRates
 import org.rsmod.api.config.refs.params
 import org.rsmod.api.npc.access.StandardNpcAccess
 import org.rsmod.api.npc.vars.typePlayerUidVarn
@@ -50,7 +50,7 @@ constructor(
         // TODO: Drop tables.
         val hero = findHero(players)
         if (hero != null) {
-            val duration = hero.lootDropDuration ?: constants.lootdrop_duration
+            val duration = hero.lootDropDuration ?: GameplayRates.current.lootVisibleTicks
             val lootTrackerEventId = nextLootTrackerEventId()
 
             val remainsParam = paramOrNull(params.dropped_remains)
@@ -160,7 +160,8 @@ public suspend fun StandardNpcAccess.death(npcRepo: NpcRepository, players: Play
     delay(deathAnim)
 
     if (npc.respawns) {
-        npcRepo.despawn(npc, npc.type.respawnRate)
+        val multiplier = GameplayRates.current.npcRespawnMultiplier
+        npcRepo.despawn(npc, GameplayRates.scaleTicks(npc.type.respawnRate, multiplier))
         return
     }
 

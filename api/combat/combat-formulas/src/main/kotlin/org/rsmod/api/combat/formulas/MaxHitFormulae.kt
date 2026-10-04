@@ -19,6 +19,7 @@ import org.rsmod.api.combat.formulas.maxhit.ranged.NvNRangedMaxHit
 import org.rsmod.api.combat.formulas.maxhit.ranged.NvPRangedMaxHit
 import org.rsmod.api.combat.formulas.maxhit.ranged.PvNRangedMaxHit
 import org.rsmod.api.combat.formulas.maxhit.ranged.PvPRangedMaxHit
+import org.rsmod.api.config.rates.GameplayRates
 import org.rsmod.game.entity.Npc
 import org.rsmod.game.entity.Player
 
@@ -76,7 +77,7 @@ constructor(
 
     /** @see [NvPMeleeMaxHit.getMaxHit] */
     public fun getMeleeMaxHit(npc: Npc, target: Player, attackType: MeleeAttackType?): Int =
-        nvpMeleeMaxHit.getMaxHit(npc, target, attackType)
+        scaleNvp(nvpMeleeMaxHit.getMaxHit(npc, target, attackType))
 
     /** @see [NvNMeleeMaxHit.getMaxHit] */
     public fun getMeleeMaxHit(npc: Npc): Int = nvnMeleeMaxHit.getMaxHit(npc)
@@ -119,7 +120,7 @@ constructor(
 
     /** @see [NvPRangedMaxHit.getMaxHit] */
     public fun getRangedMaxHit(npc: Npc, target: Player): Int =
-        nvpRangedMaxHit.getMaxHit(npc, target)
+        scaleNvp(nvpRangedMaxHit.getMaxHit(npc, target))
 
     /** @see [NvNRangedMaxHit.getMaxHit] */
     public fun getRangedMaxHit(npc: Npc): Int = nvnRangedMaxHit.getMaxHit(npc)
@@ -191,8 +192,14 @@ constructor(
         )
 
     /** @see [NvPMagicMaxHit.getMaxHit] */
-    public fun getMagicMaxHit(npc: Npc, target: Player): Int = nvpMagicMaxHit.getMaxHit(npc, target)
+    public fun getMagicMaxHit(npc: Npc, target: Player): Int =
+        scaleNvp(nvpMagicMaxHit.getMaxHit(npc, target))
 
     /** @see [NvNMagicMaxHit.getMaxHit] */
     public fun getMagicMaxHit(npc: Npc): Int = nvnMagicMaxHit.getMaxHit(npc)
+
+    private fun scaleNvp(maxHit: Int): Int {
+        val multiplier = GameplayRates.current.npcDamageMultiplier
+        return if (multiplier == 1.0) maxHit else (maxHit * multiplier).toInt()
+    }
 }

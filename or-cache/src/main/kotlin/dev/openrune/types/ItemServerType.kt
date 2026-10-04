@@ -1,7 +1,6 @@
 package dev.openrune.types
 
 import dev.openrune.ParamMap
-import dev.openrune.ServerCacheManager
 import dev.openrune.TypedParamType
 import dev.openrune.definition.Definition
 import dev.openrune.definition.EntityOpsBuilder
@@ -40,7 +39,7 @@ data class ItemServerType(
     var wearpos2: Int = -1,
     var wearpos3: Int = -1,
     var examine: String = "",
-    @param:TomlField(["params"],serializer = ParamSerializer::class)
+    @param:TomlField(["params"], serializer = ParamSerializer::class)
     var paramsRaw: MutableMap<Int, Any>? = null,
     var objvar: List<Int> = emptyList(),
     var playerCost: Int = 0,
@@ -62,6 +61,11 @@ data class ItemServerType(
     companion object {
         private val DEFAULT_OPTIONS: EntityOpsDefinition = EntityOpsBuilder().op(2, "Take").build()
     }
+
+    /** Identity is the id so types stay usable as map keys when hot reload edits them in place. */
+    override fun equals(other: Any?): Boolean = other is ItemServerType && other.id == id
+
+    override fun hashCode(): Int = id
 
     val internalName
         get() = RSCM.getReverseMapping(RSCMType.OBJ, id)
@@ -177,5 +181,4 @@ data class ItemServerType(
     public fun isType(other: String): Boolean {
         return this.id == other.asRSCM(RSCMType.OBJ)
     }
-
 }

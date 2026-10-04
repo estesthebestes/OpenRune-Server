@@ -17,10 +17,10 @@ constructor(
     @Json private val objectMapper: ObjectMapper,
 ) {
     public suspend fun load(worldId: Int): RealmConfig? {
-        return database.withTransaction { connection -> loadWorld(connection, worldId) }
+        return database.withTransaction { connection -> select(connection, worldId) }
     }
 
-    private fun loadWorld(connection: DatabaseConnection, worldId: Int): RealmConfig? {
+    public fun select(connection: DatabaseConnection, worldId: Int): RealmConfig? {
         val select =
             connection.prepareStatement(
                 OpenRuneSql.text("game/realm/select_config_by_world_id.sql"),

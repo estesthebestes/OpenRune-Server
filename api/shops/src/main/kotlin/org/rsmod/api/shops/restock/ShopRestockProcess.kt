@@ -2,6 +2,7 @@ package org.rsmod.api.shops.restock
 
 import com.github.michaelbull.logging.InlineLogger
 import jakarta.inject.Inject
+import org.rsmod.api.config.rates.GameplayRates
 import org.rsmod.api.utils.format.formatAmount
 import org.rsmod.game.MapClock
 import org.rsmod.game.inv.Inventory
@@ -43,7 +44,9 @@ public class ShopRestockProcess @Inject constructor(private val mapClock: MapClo
                 continue
             }
 
-            val restockRate = stockObj?.restockCycles ?: NON_STOCK_NORMALIZE_CYCLES
+            val baseRate = stockObj?.restockCycles ?: NON_STOCK_NORMALIZE_CYCLES
+            val multiplier = GameplayRates.current.shopRestockMultiplier
+            val restockRate = GameplayRates.scaleTicks(baseRate, multiplier)
             if (mapClock % restockRate != 0) {
                 fullyRestocked = false
                 continue

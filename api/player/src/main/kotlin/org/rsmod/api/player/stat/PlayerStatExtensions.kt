@@ -8,6 +8,7 @@ import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min
 import org.rsmod.annotations.InternalApi
+import org.rsmod.api.config.rates.GameplayRates
 import org.rsmod.api.random.GameRandom
 import org.rsmod.api.stats.levelmod.InvisibleLevels
 import org.rsmod.api.utils.skills.SkillingSuccessRate
@@ -62,6 +63,8 @@ public fun Player.statRestoreAll(stats: Iterable<String>) {
  *   convenience - for example, if the caller wants to ignore the player's personal xp rate but
  *   still apply global modifiers like Double XP Weekends. Defaults to the player's
  *   [Player.globalXpRate].
+ * @param skillRate The per-skill multiplier from `gameplay.xp.skill-multipliers` combined with any
+ *   active scheduled event.
  * @return The total amount of experience successfully added to the player's stat.
  */
 public fun Player.statAdvance(
@@ -69,7 +72,8 @@ public fun Player.statAdvance(
     xp: Double,
     rate: Double = xpRate,
     globalRate: Double = globalXpRate,
-): Int = PlayerSkillXP.internalAddXP(this, stat, xp, rate = rate * globalRate)
+    skillRate: Double = GameplayRates.skillXp(stat),
+): Int = PlayerSkillXP.internalAddXP(this, stat, xp, rate = rate * globalRate * skillRate)
 
 /**
  * Increases the player's current [stat] level.
@@ -101,7 +105,7 @@ public fun Player.statAdd(stat: String, constant: Int, percent: Int) {
 
     statMap.setCurrentLevel(stat, cappedLevel.toByte())
 
-    val statType = ServerCacheManager.getStats(stat.asRSCM(RSCMType.STAT))?: error("No stat found for $stat")
+    val statType = ServerCacheManager.getStats(stat.asRSCM(RSCMType.STAT)) ?: error("No stat found for $stat")
 
     updateStat(stat)
 
@@ -303,5 +307,5 @@ private fun statRandomRoll(
     maxLevel: Int,
 ): Boolean {
     val rate = SkillingSuccessRate.successRate(low, high, effectiveLevel, maxLevel)
-    return rate > random.randomDouble()
+    return rate * GameplayRates.current.skillingSuccessMultiplier > random.randomDouble()
 }

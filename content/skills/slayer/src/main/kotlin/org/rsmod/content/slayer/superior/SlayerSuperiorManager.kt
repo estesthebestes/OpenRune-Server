@@ -168,12 +168,20 @@ constructor(
         npcRepo.del(npc, duration = 0)
     }
 
-    private val superiorNpcIds: Set<Int> by lazy {
-        buildSet {
-            for ((_, type) in ServerCacheManager.getNpcs()) {
-                type.paramOrNull(BaseParams.slayer_superior)?.id?.let { add(it) }
-            }
+    @Volatile private var superiorNpcIdsCache: Set<Int>? = null
+
+    private val superiorNpcIds: Set<Int>
+        get() = superiorNpcIdsCache ?: buildSuperiorNpcIds().also { superiorNpcIdsCache = it }
+
+    private fun buildSuperiorNpcIds(): Set<Int> = buildSet {
+        for ((_, type) in ServerCacheManager.getNpcs()) {
+            type.paramOrNull(BaseParams.slayer_superior)?.id?.let { add(it) }
         }
+    }
+
+    /** Drops the superior npc index so it rebuilds after a `::reload types`. */
+    fun invalidateTypeIndexes() {
+        superiorNpcIdsCache = null
     }
 
     companion object {

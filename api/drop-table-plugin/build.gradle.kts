@@ -13,6 +13,7 @@ dependencies {
     implementation(libs.kotlin.inline.logger)
     runtimeOnly(libs.logback.classic)
     implementation(projects.api.areaChecker)
+    implementation(projects.api.config)
     implementation(projects.api.dropTable)
     implementation(projects.api.random)
     implementation(projects.engine.game)

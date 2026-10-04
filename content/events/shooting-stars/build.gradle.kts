@@ -6,6 +6,7 @@ dependencies {
     implementation(projects.api.pluginCommons)
     implementation(projects.api.attr)
     implementation(projects.api.shops)
+    implementation(projects.api.hotReload)
     implementation(projects.content.skills.mining)
     implementation(projects.content.skills.utils)
     implementation(libs.jackson.databind)

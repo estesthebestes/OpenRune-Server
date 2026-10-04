@@ -9,10 +9,11 @@ import org.rsmod.game.entity.Player
 public class QuestRequirementResolver
 @Inject
 constructor(config: ServerConfig) {
-    public val policy: QuestRequirementPolicy = QuestRequirementPolicy.from(config)
+    public val policy: QuestRequirementPolicy
+        get() = QuestRequirements.activePolicy()
 
     init {
-        QuestRequirements.install(policy)
+        QuestRequirements.install(QuestRequirementPolicy.from(config))
     }
 
     public fun hasCompleted(player: Player, quest: String): Boolean =
@@ -27,4 +28,3 @@ constructor(config: ServerConfig) {
     public fun satisfies(player: Player, quest: String, requirement: QuestRequirement): Boolean =
         QuestRequirements.satisfies(player, quest, requirement)
 }
-

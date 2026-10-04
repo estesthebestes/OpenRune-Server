@@ -29,7 +29,7 @@ data class ShootingstarsSettings(
 
     companion object {
         private const val CYCLES_PER_MINUTE = 100
-        private const val RESOURCE = "shootingstars.toml"
+        const val RESOURCE = "shootingstars.toml"
 
         private val mapper: ObjectMapper =
             ObjectMapper(TomlFactory()).registerKotlinModule()
@@ -46,6 +46,12 @@ data class ShootingstarsSettings(
             return stream.use { input ->
                 mapper.readValue<ShootingstarsSettings>(input).also { cached = it }
             }
+        }
+
+        fun parse(text: String): ShootingstarsSettings = mapper.readValue(text)
+
+        fun install(settings: ShootingstarsSettings) {
+            cached = settings
         }
     }
 }

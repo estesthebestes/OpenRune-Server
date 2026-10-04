@@ -1,6 +1,8 @@
 package org.rsmod.api.game.process.npc
 
+import kotlin.math.max
 import kotlin.math.sign
+import org.rsmod.api.config.rates.GameplayRates
 import org.rsmod.game.entity.Npc
 
 public class NpcRegenProcessor {
@@ -14,7 +16,8 @@ public class NpcRegenProcessor {
         }
 
         if (regenClock == 0) {
-            regenClock = regenRate
+            val multiplier = GameplayRates.current.npcRegenMultiplier
+            regenClock = if (multiplier == 1.0) regenRate else max(1, (regenRate / multiplier).toInt())
             regenStats()
             return
         }

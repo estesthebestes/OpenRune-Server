@@ -19,6 +19,12 @@ public class UnboundEventMap : EventMap<UnboundEvent, MutableList<UnboundEvent.(
         list.add(action as UnboundEvent.() -> Unit)
     }
 
+    @Suppress("UNCHECKED_CAST")
+    internal fun removeAction(type: Class<*>, action: Any): Boolean {
+        val list = events[type as Class<out UnboundEvent>] ?: return false
+        return list.removeIf { it === action }
+    }
+
     /**
      * Removes every subscriber whose backing lambda/method-reference class was defined by
      * [loader]. Used to unregister an external plugin's handlers before reloading it — see

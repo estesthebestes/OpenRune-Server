@@ -6,6 +6,7 @@ import dev.openrune.types.hunt.HuntCheckNotTooStrong
 import dev.openrune.types.hunt.HuntType
 import jakarta.inject.Inject
 import org.rsmod.api.config.constants
+import org.rsmod.api.config.rates.GameplayRates
 import org.rsmod.api.hunt.Hunt
 import org.rsmod.api.npc.isValidTarget
 import org.rsmod.api.random.CoreRandom
@@ -50,6 +51,9 @@ constructor(
         }
 
         if (huntType.type == HuntType.Player && !npc.hasInteraction()) {
+            if (!GameplayRates.current.npcAggression) {
+                return
+            }
             npc.huntPlayer(huntType)
         }
     }

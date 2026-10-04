@@ -23,7 +23,7 @@ data class ObjectServerType(
     var blockRange: Boolean = true,
     var breakRouteFinding: Boolean = false,
     var contentGroup: Int = -1,
-    @param:TomlField(["params"],serializer = ParamSerializer::class)
+    @param:TomlField(["params"], serializer = ParamSerializer::class)
     var paramsRaw: MutableMap<Int, Any>? = null,
     var name: String = "",
     var actions: EntityOpsDefinition = EntityOpsDefinition(),
@@ -35,11 +35,15 @@ data class ObjectServerType(
     var desc: String = "",
 ) : Definition {
 
+    /** Identity is the id so types stay usable as map keys when hot reload edits them in place. */
+    override fun equals(other: Any?): Boolean = other is ObjectServerType && other.id == id
+
+    override fun hashCode(): Int = id
+
     var paramMap: ParamMap? = null
 
     val multiLoc: IntArray
         get() = transforms?.toIntArray() ?: intArrayOf()
-
 
     val internalName: String
         get() = RSCM.getReverseMapping(RSCMType.LOC, id)
@@ -59,5 +63,4 @@ data class ObjectServerType(
     public fun isContentType(content: String): Boolean {
         return contentGroup == content.asRSCM(RSCMType.CONTENT)
     }
-
 }

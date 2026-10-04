@@ -58,6 +58,23 @@ dependencies {
 tasks.named<JavaExec>("run") {
     description = "Runs the RS Mod game server"
     workingDir = rootProject.projectDir
+    // Lets `::hotswap` attach its class-redefinition agent to this JVM. Dev runs only.
+    jvmArgs("-Djdk.attach.allowAttachSelf=true")
+    // `gradlew run -Pdebug` listens for an IntelliJ "Remote JVM Debug" attach on port 5005.
+    if (providers.gradleProperty("debug").isPresent) {
+        jvmArgs("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005")
+    }
+    // `gradlew run -Photswap` runs on JetBrains Runtime 21 so `::hotswap` can also add methods,
+    // fields and lambdas. Point Gradle at the JBR with `org.gradle.java.installations.paths`.
+    if (providers.gradleProperty("hotswap").isPresent) {
+        javaLauncher.set(
+            javaToolchains.launcherFor {
+                languageVersion.set(JavaLanguageVersion.of(21))
+                vendor.set(JvmVendorSpec.JETBRAINS)
+            }
+        )
+        jvmArgs("-XX:+AllowEnhancedClassRedefinition")
+    }
 }
 
 tasks.named<ShadowJar>("shadowJar") {

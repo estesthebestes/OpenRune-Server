@@ -135,7 +135,8 @@ public class Npc(
     public var baseMagicLvl: Int = type.magic
 
     public var regenClock: Int = 0
-    public val regenRate: Int = type.regenRate
+    public val regenRate: Int
+        get() = type.regenRate
 
     public var huntClock: Int = 0
 

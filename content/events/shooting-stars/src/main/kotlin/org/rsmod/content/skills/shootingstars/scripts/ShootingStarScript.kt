@@ -2,6 +2,7 @@ package org.rsmod.content.skills.shootingstars.scripts
 
 import jakarta.inject.Inject
 import org.rsmod.api.game.process.GameLifecycle
+import org.rsmod.api.hotreload.HotReloadRegistry
 import org.rsmod.api.player.output.mes
 import org.rsmod.api.player.protect.ProtectedAccess
 import org.rsmod.api.script.onCommand
@@ -11,6 +12,7 @@ import org.rsmod.api.script.onOpLoc2
 import org.rsmod.api.script.onOpLoc3
 import org.rsmod.api.table.ShootingStarLocationsRow
 import org.rsmod.content.skills.shootingstars.ShootingStarManager
+import org.rsmod.content.skills.shootingstars.ShootingStarReloadTarget
 import org.rsmod.content.skills.shootingstars.ShootingStarStages
 import org.rsmod.content.skills.shootingstars.ShootingstarsSettings
 import org.rsmod.content.skills.shootingstars.byKey
@@ -23,11 +25,14 @@ class ShootingStarScript
 constructor(
     private val stars: ShootingStarManager,
     private val mining: StarMiningScript,
+    private val reloads: HotReloadRegistry,
+    private val reloadTarget: ShootingStarReloadTarget,
 ) : PluginScript() {
     private val settings: ShootingstarsSettings
         get() = ShootingstarsSettings.load()
 
     override fun ScriptContext.startup() {
+        reloads.register(reloadTarget)
         val settings = settings
         if (!settings.isEnabled) {
             return

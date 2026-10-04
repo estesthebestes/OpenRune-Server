@@ -39,6 +39,16 @@ public class MagicSpellRegistry {
         this.autocastSpells = autocastSpells
     }
 
+    /** Re-reads spell params after `::reload types`; the set of spells itself never changes. */
+    internal fun rebuild() {
+        val objSpells = loadObjSpells()
+        val autocastSpells = loadAutocastSpells(objSpells)
+        this.objSpells = objSpells
+        this.autocastSpells = autocastSpells
+    }
+
+    internal fun isSpellObj(id: Int): Boolean = objSpells.containsKey(id)
+
     private fun loadObjSpells(): Map<Int, MagicSpell> {
         val spells = hashMapOf<Int, MagicSpell>()
 

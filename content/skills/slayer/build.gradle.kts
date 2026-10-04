@@ -9,6 +9,7 @@ dependencies {
     implementation(projects.api.config)
     implementation(projects.api.death)
     implementation(projects.api.generated)
+    implementation(projects.api.hotReload)
     implementation(projects.api.npc)
     implementation(projects.api.player)
     implementation(projects.api.playerOutput)

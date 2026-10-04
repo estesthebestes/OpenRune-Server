@@ -11,6 +11,7 @@ import dtx.core.flatten
 import jakarta.inject.Inject
 import org.rsmod.api.attr.AttributeKey
 import org.rsmod.api.config.objParam
+import org.rsmod.api.config.rates.GameplayRates
 import org.rsmod.api.config.refs.params
 import org.rsmod.api.droptable.DropRollItem
 import org.rsmod.api.player.events.skilling.SkillingProduct
@@ -179,7 +180,7 @@ constructor(
                 }
             }
 
-            if (product.depletes && shouldDeplete(rock, data)) {
+            if (product.depletes && shouldDeplete(rock, data) && passesDepleteMultiplier()) {
                 clearDepleteState(rock)
                 depleteRock(rock, data)
                 return
@@ -262,8 +263,14 @@ constructor(
 
     private fun ProtectedAccess.depleteRock(rock: BoundLocInfo, data: MiningRocksRow) {
         val empty = data.emptyRockObject ?: return
-        locRepo.change(rock, empty, data.respawnCycles)
+        val multiplier = GameplayRates.current.resourceRespawnMultiplier
+        locRepo.change(rock, empty, GameplayRates.scaleTicks(data.respawnCycles, multiplier))
         resetAnim()
+    }
+
+    private fun ProtectedAccess.passesDepleteMultiplier(): Boolean {
+        val multiplier = GameplayRates.current.resourceDepleteMultiplier
+        return multiplier >= 1.0 || random.randomDouble() < multiplier
     }
 
     private fun ProtectedAccess.shouldDeplete(rock: BoundLocInfo, data: MiningRocksRow): Boolean {

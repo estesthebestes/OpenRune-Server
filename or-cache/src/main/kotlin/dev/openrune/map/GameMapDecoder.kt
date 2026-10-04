@@ -63,9 +63,15 @@ object GameMapDecoder {
         return if (bridged) level - 1 else level
     }
 
-    public fun decodeAll(spawnSink: GameMapSpawnSink, cache: Cache): Unit =
+    /** @param onSquaresLoaded receives every map square that had both map and loc data. */
+    public fun decodeAll(
+        spawnSink: GameMapSpawnSink,
+        cache: Cache,
+        onSquaresLoaded: (Set<MapSquareKey>) -> Unit = {},
+    ): Unit =
         runBlocking(Dispatchers.Default) {
             val mapBuffers = cache.readMapBuffers()
+            onSquaresLoaded(mapBuffers.mapTo(hashSetOf()) { it.key })
             val decodedMaps = decodeAll(mapBuffers)
             putMapCollision(decodedMaps)
             putAreas(decodedMaps)

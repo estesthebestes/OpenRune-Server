@@ -38,6 +38,71 @@ public data class GameplayConfig(
     val questRequirements: QuestRequirementsYaml = QuestRequirementsYaml(),
     @JsonProperty("drop-rates")
     val dropRates: DropRatesYaml = DropRatesYaml(),
+    val xp: XpRatesYaml = XpRatesYaml(),
+    val regen: RegenRatesYaml = RegenRatesYaml(),
+    val skilling: SkillingRatesYaml = SkillingRatesYaml(),
+    val combat: CombatRatesYaml = CombatRatesYaml(),
+    val world: WorldRatesYaml = WorldRatesYaml(),
+    val events: List<GameEventYaml> = emptyList(),
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public data class XpRatesYaml(
+    @JsonProperty("skill-multipliers") val skillMultipliers: Map<String, Double> = emptyMap(),
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public data class RegenRatesYaml(
+    @JsonProperty("health-interval-ticks") val healthIntervalTicks: Int = 100,
+    @JsonProperty("health-amount") val healthAmount: Int = 1,
+    @JsonProperty("stat-restore-interval-ticks") val statRestoreIntervalTicks: Int = 100,
+    @JsonProperty("boost-decay-interval-ticks") val boostDecayIntervalTicks: Int = 100,
+    @JsonProperty("run-restore-multiplier") val runRestoreMultiplier: Double = 1.0,
+    @JsonProperty("run-drain-multiplier") val runDrainMultiplier: Double = 1.0,
+    @JsonProperty("prayer-drain-multiplier") val prayerDrainMultiplier: Double = 1.0,
+    @JsonProperty("prayer-regen-amount") val prayerRegenAmount: Int = 0,
+    @JsonProperty("special-attack-interval-ticks") val specialAttackIntervalTicks: Int = 50,
+    @JsonProperty("special-attack-amount") val specialAttackAmount: Int = 100,
+    @JsonProperty("npc-regen-multiplier") val npcRegenMultiplier: Double = 1.0,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public data class SkillingRatesYaml(
+    @JsonProperty("success-multiplier") val successMultiplier: Double = 1.0,
+    @JsonProperty("resource-respawn-multiplier") val resourceRespawnMultiplier: Double = 1.0,
+    @JsonProperty("resource-deplete-multiplier") val resourceDepleteMultiplier: Double = 1.0,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public data class CombatRatesYaml(
+    @JsonProperty("player-damage-multiplier") val playerDamageMultiplier: Double = 1.0,
+    @JsonProperty("npc-damage-multiplier") val npcDamageMultiplier: Double = 1.0,
+    @JsonProperty("npc-aggression") val npcAggression: Boolean = true,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public data class WorldRatesYaml(
+    @JsonProperty("npc-respawn-multiplier") val npcRespawnMultiplier: Double = 1.0,
+    @JsonProperty("loot-visible-ticks") val lootVisibleTicks: Int = 200,
+    @JsonProperty("shop-restock-multiplier") val shopRestockMultiplier: Double = 1.0,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public data class GameEventYaml(
+    val name: String,
+    val start: String,
+    val end: String,
+    @JsonProperty("global-xp") val globalXp: Double = 1.0,
+    @JsonProperty("drop-multiplier") val dropMultiplier: Double = 1.0,
+    @JsonProperty("skill-multipliers") val skillMultipliers: Map<String, Double> = emptyMap(),
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public data class HotReloadYaml(
+    val watch: Boolean = false,
+    @JsonProperty("debounce-ms") val debounceMs: Long = 500,
+    val code: Boolean = false,
+    val paths: Map<String, String> = emptyMap(),
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -66,4 +131,5 @@ public data class ServerConfig(
     val central: OpenRuneCentralGameConfig? = null,
     @JsonProperty("login-timing-logs") val loginTimingLogs: Boolean = false,
     @JsonProperty("social-pm-trace-logs") val socialPmTraceLogs: Boolean = false,
+    @JsonProperty("hot-reload") val hotReload: HotReloadYaml = HotReloadYaml(),
 )

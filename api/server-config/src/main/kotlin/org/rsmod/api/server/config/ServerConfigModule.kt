@@ -7,7 +7,7 @@ import java.nio.file.Paths
 import org.rsmod.module.ExtendedModule
 
 public object ServerConfigModule : ExtendedModule() {
-    private val configFile: Path
+    public val configFile: Path
         get() = Paths.get("./", "game.yml")
 
     override fun bind() {

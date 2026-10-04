@@ -28,6 +28,7 @@ import kotlin.math.max
 import kotlin.reflect.KClass
 import org.rsmod.annotations.InternalApi
 import org.rsmod.api.config.constants
+import org.rsmod.api.config.rates.GameplayRates
 import org.rsmod.api.config.refs.done.BaseHitmarkGroups
 import org.rsmod.api.config.refs.done.hitmark_groups
 import org.rsmod.api.hunt.NpcSearch
@@ -1322,8 +1323,9 @@ public class ProtectedAccess(
         xp: Double,
         rate: Double = player.xpRate,
         globalRate: Double = player.globalXpRate,
+        skillRate: Double = GameplayRates.skillXp(stat),
     ): Int {
-        return player.statAdvance(stat, xp, rate, globalRate)
+        return player.statAdvance(stat, xp, rate, globalRate, skillRate)
     }
 
     /** @see [org.rsmod.api.player.stat.statAdd] */

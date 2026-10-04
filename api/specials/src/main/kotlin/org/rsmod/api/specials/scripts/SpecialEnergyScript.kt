@@ -2,6 +2,7 @@ package org.rsmod.api.specials.scripts
 
 import kotlin.math.min
 import org.rsmod.api.config.constants
+import org.rsmod.api.config.rates.GameplayRates
 import org.rsmod.api.player.vars.boolVarBit
 import org.rsmod.api.player.vars.intVarp
 import org.rsmod.api.script.onPlayerLogin
@@ -23,11 +24,12 @@ public class SpecialEnergyScript() : PluginScript() {
         if (newAccount) {
             specialAttackEnergy = constants.sa_max_energy
         }
-        softTimer("timer.spec_regen", constants.spec_regen_interval)
+        softTimer("timer.spec_regen", GameplayRates.current.specialAttackIntervalTicks)
     }
 
     private fun Player.specRegen() {
-        val increased = min(constants.sa_max_energy, specialAttackEnergy + 100)
+        val amount = GameplayRates.current.specialAttackAmount
+        val increased = min(constants.sa_max_energy, specialAttackEnergy + amount)
         if (increased > specialAttackEnergy) {
             specialAttackEnergy = increased
         }

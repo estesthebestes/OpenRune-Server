@@ -756,7 +756,13 @@ constructor(
             }
             val xpDelta = xp - statMap.getXP(statInternal)
             statMap.setCurrentLevel(statInternal, targetLevel.toByte())
-            statAdvance(statInternal, xpDelta.toDouble(), rate = 1.0)
+            statAdvance(
+                statInternal,
+                xpDelta.toDouble(),
+                rate = 1.0,
+                globalRate = 1.0,
+                skillRate = 1.0,
+            )
         }
     }
 

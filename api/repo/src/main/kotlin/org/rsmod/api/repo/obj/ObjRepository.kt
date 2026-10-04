@@ -4,6 +4,7 @@ import dev.openrune.rscm.RSCM
 import dev.openrune.rscm.RSCMType
 import dev.openrune.types.ItemServerType
 import jakarta.inject.Inject
+import java.util.concurrent.ConcurrentLinkedQueue
 import org.rsmod.api.registry.obj.ObjRegistry
 import org.rsmod.api.registry.obj.ObjRegistryResult
 import org.rsmod.api.registry.obj.isSuccess
@@ -15,7 +16,6 @@ import org.rsmod.game.obj.ObjScope
 import org.rsmod.game.type.getObj
 import org.rsmod.map.CoordGrid
 import org.rsmod.map.zone.ZoneKey
-import java.util.concurrent.ConcurrentLinkedQueue
 
 public class ObjRepository
 @Inject
@@ -118,6 +118,23 @@ constructor(private val mapClock: MapClock, private val registry: ObjRegistry) {
     public fun findAll(zone: ZoneKey): Sequence<Obj> = registry.findAll(zone)
 
     public fun findAll(coords: CoordGrid): Sequence<Obj> = registry.findAll(coords)
+
+    /**
+     * Cancels up to [limit] pending respawns of permanent [type] objs at [coords] (objs that were
+     * picked up and are waiting to reappear). Returns how many respawns were cancelled.
+     */
+    public fun cancelRespawns(coords: CoordGrid, type: Int, limit: Int): Int {
+        var cancelled = 0
+        val iterator = delDurations.iterator()
+        while (iterator.hasNext() && cancelled < limit) {
+            val obj = iterator.next().obj
+            if (obj.coords == coords && obj.type == type) {
+                iterator.remove()
+                cancelled++
+            }
+        }
+        return cancelled
+    }
 
     private fun addDurations(objs: Iterable<Obj>, duration: Int, reveal: Int) {
         for (obj in objs) {

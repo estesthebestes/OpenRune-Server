@@ -38,9 +38,19 @@ public abstract class MapSpawnPackerBase<D : Any> {
 
     protected abstract fun decodeTomlSpawnFile(path: Path): List<Pair<MapSquareKey, D>>
 
-    protected fun loadAndCollect(): Map<MapSquareKey, D> {
-        val files = listTomlFiles(resourceDir)
-        val resources = files.flatMap(::decodeTomlSpawnFile)
+    protected fun loadAndCollect(): Map<MapSquareKey, D> = collect(resourceDir)
+
+    /** Parses every spawn TOML directly in [dir], merged per map square like the cache packer. */
+    public fun collect(dir: Path): Map<MapSquareKey, D> {
+        val files = listTomlFiles(dir)
+        val resources =
+            files.flatMap { file ->
+                try {
+                    decodeTomlSpawnFile(file)
+                } catch (e: Exception) {
+                    throw IllegalStateException("${file.fileName}: ${e.message}", e)
+                }
+            }
         return resources.mergeToMap()
     }
 

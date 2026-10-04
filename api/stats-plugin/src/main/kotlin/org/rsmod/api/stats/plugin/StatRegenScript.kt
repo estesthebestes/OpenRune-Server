@@ -4,7 +4,8 @@ import dev.openrune.ServerCacheManager
 import dev.openrune.rscm.RSCM
 import dev.openrune.rscm.RSCMType
 import dev.openrune.types.StatType
-import org.rsmod.api.config.constants
+import kotlin.math.min
+import org.rsmod.api.config.rates.GameplayRates
 import org.rsmod.api.player.hands
 import org.rsmod.api.player.stat.StatBoostDecayPrevention
 import org.rsmod.api.player.stat.baseHitpointsLvl
@@ -27,7 +28,10 @@ public class StatRegenScript : PluginScript() {
     override fun ScriptContext.startup() {
         onPlayerLogin { player.initRegenTimers() }
 
-        onPlayerSoftTimer("timer.stat_regen") { player.statRegen() }
+        onPlayerSoftTimer("timer.stat_regen") {
+            player.statRegen()
+            player.prayerRegen()
+        }
         onPlayerSoftTimer("timer.stat_boost_restore") { player.statBoostRestore() }
         onPlayerSoftTimer("timer.health_regen") { player.healthRegen() }
 
@@ -35,14 +39,15 @@ public class StatRegenScript : PluginScript() {
     }
 
     private fun Player.initRegenTimers() {
-        softTimer("timer.stat_regen", constants.stat_regen_interval)
-        softTimer("timer.stat_boost_restore", constants.stat_boost_restore_interval)
-        softTimer("timer.health_regen", constants.health_regen_interval)
+        val rates = GameplayRates.current
+        softTimer("timer.stat_regen", rates.statRestoreIntervalTicks)
+        softTimer("timer.stat_boost_restore", rates.boostDecayIntervalTicks)
+        softTimer("timer.health_regen", rates.healthIntervalTicks)
     }
 
     private fun Player.statRegen() {
         for (stat in regenStats) {
-            val statInternal = RSCM.getReverseMapping(RSCMType.STAT,stat.id)
+            val statInternal = RSCM.getReverseMapping(RSCMType.STAT, stat.id)
 
             val base = statBase(statInternal)
             val current = stat(statInternal)
@@ -52,9 +57,20 @@ public class StatRegenScript : PluginScript() {
         }
     }
 
+    private fun Player.prayerRegen() {
+        val amount = GameplayRates.current.prayerRegenAmount
+        if (amount <= 0) {
+            return
+        }
+        val missing = statBase("stat.prayer") - stat("stat.prayer")
+        if (missing > 0) {
+            statAdd("stat.prayer", constant = min(amount, missing), percent = 0)
+        }
+    }
+
     private fun Player.statBoostRestore() {
         for (stat in regenStats) {
-            val statInternal = RSCM.getReverseMapping(RSCMType.STAT,stat.id)
+            val statInternal = RSCM.getReverseMapping(RSCMType.STAT, stat.id)
 
             val base = statBase(statInternal)
             val current = stat(statInternal)
@@ -78,7 +94,8 @@ public class StatRegenScript : PluginScript() {
         if (hitpoints >= baseHitpointsLvl) {
             return
         }
-        val amount = if (hands.isType("obj.jewl_bracelet_regen")) 2 else 1
+        val base = GameplayRates.current.healthAmount
+        val amount = if (hands.isType("obj.jewl_bracelet_regen")) base * 2 else base
         statHeal("stat.hitpoints", constant = amount, percent = 0)
     }
 
