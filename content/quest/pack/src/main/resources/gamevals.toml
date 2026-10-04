@@ -63,12 +63,19 @@ restless_ghost_return_tile = 63704
 misthalin_return_tile = 63700
 misthalin_mirror_blocker = 63701
 misthalin_puzzle_state = 63702
+clocktower_state = 63820
 
 [gamevals.varbit]
 restless_ghost_progress = 63702
 imp_catcher_progress = 63703
 misthalin_reflections = 63700
 misthalin_gem_row_slot = 63701
+clocktower_progress = 63820
+clocktower_red_cog = 63821
+clocktower_black_cog = 63822
+clocktower_blue_cog = 63823
+clocktower_white_cog = 63824
+clocktower_rats_poisoned = 63825
 
 [gamevals.models]
 misthalin_gem_diamond = 32333
