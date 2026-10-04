@@ -1,5 +1,7 @@
 package org.rsmod.content.areas.city.portsarim.travel
 
+import dev.openrune.rscm.RSCM.asRSCM
+import dev.openrune.rscm.RSCMType
 import jakarta.inject.Inject
 import org.rsmod.api.player.dialogue.Dialogue
 import org.rsmod.api.player.protect.ProtectedAccess
@@ -9,8 +11,11 @@ import org.rsmod.api.script.onOpLoc1
 import org.rsmod.api.script.onOpNpc1
 import org.rsmod.api.script.onOpNpc3
 import org.rsmod.api.script.onOpNpc4
+import org.rsmod.api.script.onOpNpcU
 import org.rsmod.api.script.onPlayerLogin
+import org.rsmod.content.quest.area.kourend.ClientOfKourend
 import org.rsmod.content.quest.area.lumbridge.XMarksTheSpot
+import org.rsmod.content.quest.manager.menu
 import org.rsmod.game.entity.Player
 import org.rsmod.map.CoordGrid
 import org.rsmod.plugin.scripts.PluginScript
@@ -25,7 +30,12 @@ private enum class VeosPort(val displayName: String, val arrival: CoordGrid) {
     LandsEnd("Land's End", CoordGrid(1504, 3399, 0)),
 }
 
-class VeosScript @Inject constructor(private val xMarks: XMarksTheSpot) : PluginScript() {
+class VeosScript
+@Inject
+constructor(
+    private val xMarks: XMarksTheSpot,
+    private val clientOfKourend: ClientOfKourend,
+) : PluginScript() {
     override fun ScriptContext.startup() {
         onPlayerLogin {
             if (player.veosPiscVis == 0) player.veosPiscVis = VEOS_PISC_TRAVEL
@@ -42,6 +52,13 @@ class VeosScript @Inject constructor(private val xMarks: XMarksTheSpot) : Plugin
             startDialogue(it.npc) { veosAtPiscarilius() }
         }
         onOpNpc3(VEOS_PISCARILIUS) { sail(VeosPort.PortSarim) }
+        onOpNpcU(VEOS_PISCARILIUS) {
+            if (it.objType.id != KHAREDSTS_MEMOIRS.asRSCM(RSCMType.OBJ)) {
+                mes("Nothing interesting happens.")
+                return@onOpNpcU
+            }
+            startDialogue(it.npc) { discussMemoirs() }
+        }
         onOpNpc4(VEOS_PISCARILIUS) { sail(VeosPort.LandsEnd) }
 
         onOpLoc1("loc.sailing_sarim_veos_shipplank_off") { disembark(SARIM_QUAY) }
@@ -82,18 +99,21 @@ class VeosScript @Inject constructor(private val xMarks: XMarksTheSpot) : Plugin
     private suspend fun Dialogue.veosAtPiscarilius() {
         chatNpc(quiz, "Hello again, ${player.displayName}! What can I do for you?")
         while (true) {
-            val topic =
-                choice4(
-                    "Where am I exactly?",
-                    VeosTopic.Where,
-                    "Can you take me somewhere?",
-                    VeosTopic.Travel,
-                    "Could you tell me more about Kourend?",
-                    VeosTopic.Kourend,
-                    "Nothing, thanks.",
-                    VeosTopic.Leave,
-                )
-            when (topic) {
+            val questTopic = clientOfKourend.veosTopic(player)
+            val kourendTopic =
+                if (clientOfKourend.quest.isQuestNotStarted(player)) {
+                    "Could you give me some advice on Kourend?"
+                } else {
+                    "Could you tell me more about Kourend?"
+                }
+            val options = buildList {
+                add("Where am I exactly?" to VeosTopic.Where)
+                add("Can you take me somewhere?" to VeosTopic.Travel)
+                add(kourendTopic to VeosTopic.Kourend)
+                questTopic?.let { add(it to VeosTopic.Quest) }
+                add("Nothing, thanks." to VeosTopic.Leave)
+            }
+            when (menu(options)) {
                 VeosTopic.Where -> whereAmI()
                 VeosTopic.Travel -> {
                     chatPlayer(quiz, "Can you take me somewhere?")
@@ -103,9 +123,26 @@ class VeosScript @Inject constructor(private val xMarks: XMarksTheSpot) : Plugin
                     chatPlayer(quiz, "Could you tell me more about Kourend?")
                     describeKourend(fromKourend = true)
                 }
+                VeosTopic.Quest -> return with(clientOfKourend) { veosPiscariliusQuest() }
                 VeosTopic.Leave -> return chatPlayer(neutral, "Nothing, thanks.")
             }
         }
+    }
+
+    private suspend fun Dialogue.discussMemoirs() {
+        chatPlayer(quiz, "What's this old book you gave me?")
+        chatNpc(
+            neutral,
+            "Ah, that. I picked it up at an auction a while ago. Supposedly it belonged to the " +
+                "daughter of King Kharedst IV, the last king of Great Kourend.",
+        )
+        chatPlayer(quiz, "Why did you give it to me?")
+        chatNpc(
+            neutral,
+            "I'd hoped there might be something interesting in it, but most of the pages are " +
+                "missing, so it's no use to me. I thought you might find something to do with it.",
+        )
+        chatPlayer(happy, "Fair enough. Thanks!")
     }
 
     private suspend fun Dialogue.chooseDestination(mainland: VeosPort, farewell: String) {
@@ -191,6 +228,7 @@ class VeosScript @Inject constructor(private val xMarks: XMarksTheSpot) : Plugin
         Where,
         Travel,
         Kourend,
+        Quest,
         Leave,
     }
 
@@ -198,6 +236,7 @@ class VeosScript @Inject constructor(private val xMarks: XMarksTheSpot) : Plugin
         const val VEOS_SARIM = "npc.veos_sarim"
         const val VEOS_PISCARILIUS = "npc.veos"
         const val VEOS_PISC_TRAVEL = 1
+        const val KHAREDSTS_MEMOIRS = "obj.veos_kharedsts_memoirs"
         const val LONG_VOYAGE = "As you wish, I hope you don't get seasick, it is a long voyage."
 
         val SARIM_QUAY = CoordGrid(3055, 3245, 0)
