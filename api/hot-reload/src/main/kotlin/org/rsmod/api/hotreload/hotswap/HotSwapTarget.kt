@@ -96,11 +96,19 @@ constructor(
             throw ReloadException("Class redefinition was rejected: ${e.message}", e)
         }
         val defined = defineNew(added, previous.keys)
+        val undefined = added.keys - defined.mapTo(hashSetOf()) { it.name }
         // Incremental compiles briefly delete class files; keep their entries so a class that
-        // reappears unchanged is not mistaken for a new one.
-        baseline = previous + current
+        // reappears unchanged is not mistaken for a new one. Classes that could not be defined
+        // stay out of the baseline so they keep showing up as pending.
+        baseline = previous + current - undefined
 
         val warnings = mutableListOf<String>()
+        if (undefined.isNotEmpty()) {
+            val packages = undefined.map { it.substringBeforeLast('.') }.distinct()
+            warnings +=
+                "${undefined.size} new classes need a restart (new packages can't be added " +
+                    "live): ${packages.joinToString()}"
+        }
         val touched = (changed.keys + added.keys).mapTo(hashSetOf()) { it.substringBefore('$') }
         var restarted = 0
         for (script in LoadedPluginScripts.all()) {
