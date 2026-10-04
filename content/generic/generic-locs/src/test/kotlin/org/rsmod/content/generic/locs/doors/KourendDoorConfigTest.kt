@@ -113,17 +113,20 @@ class KourendDoorConfigTest {
     }
 
     @Test
-    fun `every openable door or gate in kourend is configured or knowingly skipped`() {
+    fun `every openable door or gate in kourend is configured, scripted or knowingly skipped`() {
         val doorGroups = STAGE_PAIRS.keys.map { it.asRSCM(RSCMType.CONTENT) }.toSet()
         val unhandled = sortedSetOf<String>()
-        for (id in spawns.map { it.id }.toSet()) {
+        val spawned = spawns.map { it.id }.toSet()
+        val variants =
+            spawned.flatMap { ServerCacheManager.getObject(it)?.multiLoc?.toList().orEmpty() }
+        for (id in spawned + variants.filter { it != -1 }) {
             val type = ServerCacheManager.getObject(id) ?: continue
             val name = type.name.lowercase()
             val op = type.actions.getOpOrNull(0)
             if (("door" !in name && "gate" !in name) || (op != "Open" && op != "Close")) continue
             val loc = locName(id)
             val configured = loc in entries || type.contentGroup in doorGroups
-            if (!configured && loc !in SKIPPED) unhandled += loc
+            if (!configured && loc !in SCRIPTED && loc !in SKIPPED) unhandled += loc
         }
         assertTrue(unhandled.isEmpty(), "Kourend doors with no door config: $unhandled")
     }
@@ -166,21 +169,35 @@ class KourendDoorConfigTest {
 
         val CLOSED_GROUPS = STAGE_PAIRS.keys.filter { "closed" in it }.toSet()
 
+        /** Doors whose requirements or behaviour are scripted in `content/areas/zeah`. */
+        val SCRIPTED =
+            mapOf(
+                "loc.kore2_hos_door_inactive" to "locked outhouse door",
+                "loc.hos_grape_odddoor" to "occupied vinery outhouse",
+                "loc.hosidius_tithe_farm_door" to "Tithe Farm entrance (34 Farming)",
+                "loc.wcguild_gatel" to "Woodcutting Guild entrance (60 Woodcutting)",
+                "loc.wcguild_gater" to "Woodcutting Guild entrance (60 Woodcutting)",
+                "loc.kebos_farming_guild_door_left_closed" to "Farming Guild entrance (45 Farming)",
+                "loc.kebos_farming_guild_door_right_closed" to "Farming Guild entrance (45 Farming)",
+                "loc.lovaquest_tower_entry_door" to "The Forsaken Tower entrance",
+                "loc.arcquest_tower_door_left" to "Tower of Magic entrance (The Ascent of Arceuus)",
+                "loc.arcquest_tower_door_right" to "Tower of Magic entrance (The Ascent of Arceuus)",
+                "loc.mdaughter_tent_door_open" to "tent flaps swap in place",
+                "loc.mdaughter_tent_door_openl" to "tent flaps swap in place",
+                "loc.mdaughter_tent_door" to "tent flaps swap in place",
+                "loc.mdaughter_tent_doorl" to "tent flaps swap in place",
+                "loc.ga_fencegate_l_normal" to "Getting Ahead pen gate, multiloc on varbit.ga",
+                "loc.ga_fencegate_r_normal" to "Getting Ahead pen gate, multiloc on varbit.ga",
+                "loc.ga_fencegate_l_flour" to "Getting Ahead pen gate, multiloc on varbit.ga",
+                "loc.ga_fencegate_r_flour" to "Getting Ahead pen gate, multiloc on varbit.ga",
+            )
+
         val SKIPPED =
             mapOf(
-                "loc.kore2_hos_door_inactive" to "locked door with no open stage",
-                "loc.hos_grape_odddoor" to "no open stage in the cache",
-                "loc.hosidius_tithe_farm_door" to "Tithe Farm minigame entrance",
-                "loc.wcguild_gatel" to "Woodcutting Guild entrance (level requirement)",
-                "loc.wcguild_gater" to "Woodcutting Guild entrance (level requirement)",
-                "loc.kebos_farming_guild_door_left_closed" to "Farming Guild entrance",
-                "loc.kebos_farming_guild_door_right_closed" to "Farming Guild entrance",
-                "loc.lovaquest_tower_entry_door" to "The Forsaken Tower entrance",
-                "loc.arcquest_tower_door_left" to "The Ascent of Arceuus tower entrance",
-                "loc.arcquest_tower_door_right" to "The Ascent of Arceuus tower entrance",
-                "loc.akd_hughes_gate_1" to "A Kingdom Divided cell door",
-                "loc.mdaughter_tent_door_open" to "tent flaps swap in place, not like a door",
-                "loc.mdaughter_tent_door_openl" to "tent flaps swap in place, not like a door",
+                "loc.akd_hughes_gate_1" to
+                    "A Kingdom Divided cell door: no open stage, OSRS behaviour undocumented",
+                "loc.akd_lookout_trapdoor_closed" to
+                    "A Kingdom Divided lookout trapdoor (multiloc variant), not a wall door",
             )
 
         fun parseEntries(file: File): List<Entry> {
