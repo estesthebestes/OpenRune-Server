@@ -1,0 +1,26 @@
+[[npc]]
+id = "npc.khazard_warlord"
+inherit = "npc.khazard_warlord"
+[npc.params]
+"param.attack_anim" = "seq.human_blunt_pound"
+"param.npc_attack_type" = "category.attacktype_crush"
+"param.attack_sound" = 2567
+"param.defend_anim" = "seq.human_blunt_block"
+
+[[npc]]
+id = "npc.khazard_warlord_chat"
+inherit = "npc.khazard_warlord_chat"
+[npc.params]
+"param.attack_anim" = "seq.human_blunt_pound"
+"param.npc_attack_type" = "category.attacktype_crush"
+"param.attack_sound" = 2567
+"param.defend_anim" = "seq.human_blunt_block"
+
+[[npc]]
+id = "npc.khazard_warlord_combat"
+inherit = "npc.khazard_warlord_combat"
+[npc.params]
+"param.attack_anim" = "seq.human_blunt_pound"
+"param.npc_attack_type" = "category.attacktype_crush"
+"param.attack_sound" = 2567
+"param.defend_anim" = "seq.human_blunt_block"
