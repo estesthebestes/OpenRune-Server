@@ -1,0 +1,417 @@
+## Doors and gates of Great Kourend and the Kebos Lowlands
+
+# Hosidius and central Kourend houses
+
+[[object]]
+id = "loc.kore2_hos_door_closed"
+inherit = "loc.kore2_hos_door_closed"
+contentGroup = "content.closed_single_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.kore2_hos_door_open"
+
+[[object]]
+id = "loc.kore2_hos_door_open"
+inherit = "loc.kore2_hos_door_open"
+contentGroup = "content.opened_single_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.kore2_hos_door_closed"
+
+[[object]]
+id = "loc.viking_abode_door"
+inherit = "loc.viking_abode_door"
+contentGroup = "content.closed_single_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.viking_abode_door_open"
+
+[[object]]
+id = "loc.viking_abode_door_open"
+inherit = "loc.viking_abode_door_open"
+contentGroup = "content.opened_single_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.viking_abode_door"
+
+# Arceuus
+
+[[object]]
+id = "loc.archeuus_door_double_left_turquoise"
+inherit = "loc.archeuus_door_double_left_turquoise"
+contentGroup = "content.closed_left_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.archeuus_door_double_left_turquoise_open"
+
+[[object]]
+id = "loc.archeuus_door_double_left_turquoise_open"
+inherit = "loc.archeuus_door_double_left_turquoise_open"
+contentGroup = "content.opened_left_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.archeuus_door_double_left_turquoise"
+
+[[object]]
+id = "loc.archeuus_door_double_right_turquoise"
+inherit = "loc.archeuus_door_double_right_turquoise"
+contentGroup = "content.closed_right_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.archeuus_door_double_right_turquoise_open"
+
+[[object]]
+id = "loc.archeuus_door_double_right_turquoise_open"
+inherit = "loc.archeuus_door_double_right_turquoise_open"
+contentGroup = "content.opened_right_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.archeuus_door_double_right_turquoise"
+
+[[object]]
+id = "loc.archeuus_door_double_left_green"
+inherit = "loc.archeuus_door_double_left_green"
+contentGroup = "content.closed_left_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.archeuus_door_double_left_green_open"
+
+[[object]]
+id = "loc.archeuus_door_double_left_green_open"
+inherit = "loc.archeuus_door_double_left_green_open"
+contentGroup = "content.opened_left_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.archeuus_door_double_left_green"
+
+[[object]]
+id = "loc.archeuus_door_double_right_green"
+inherit = "loc.archeuus_door_double_right_green"
+contentGroup = "content.closed_right_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.archeuus_door_double_right_green_open"
+
+[[object]]
+id = "loc.archeuus_door_double_right_green_open"
+inherit = "loc.archeuus_door_double_right_green_open"
+contentGroup = "content.opened_right_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.archeuus_door_double_right_green"
+
+[[object]]
+id = "loc.archeuus_door_double_left_red"
+inherit = "loc.archeuus_door_double_left_red"
+contentGroup = "content.closed_left_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.archeuus_door_double_left_red_open"
+
+[[object]]
+id = "loc.archeuus_door_double_left_red_open"
+inherit = "loc.archeuus_door_double_left_red_open"
+contentGroup = "content.opened_left_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.archeuus_door_double_left_red"
+
+[[object]]
+id = "loc.archeuus_door_double_right_red"
+inherit = "loc.archeuus_door_double_right_red"
+contentGroup = "content.closed_right_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.archeuus_door_double_right_red_open"
+
+[[object]]
+id = "loc.archeuus_door_double_right_red_open"
+inherit = "loc.archeuus_door_double_right_red_open"
+contentGroup = "content.opened_right_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.archeuus_door_double_right_red"
+
+[[object]]
+id = "loc.archeuus_door_double_left_blue"
+inherit = "loc.archeuus_door_double_left_blue"
+contentGroup = "content.closed_left_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.archeuus_door_double_left_blue_open"
+
+[[object]]
+id = "loc.archeuus_door_double_left_blue_open"
+inherit = "loc.archeuus_door_double_left_blue_open"
+contentGroup = "content.opened_left_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.archeuus_door_double_left_blue"
+
+[[object]]
+id = "loc.archeuus_door_double_right_blue"
+inherit = "loc.archeuus_door_double_right_blue"
+contentGroup = "content.closed_right_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.archeuus_door_double_right_blue_open"
+
+[[object]]
+id = "loc.archeuus_door_double_right_blue_open"
+inherit = "loc.archeuus_door_double_right_blue_open"
+contentGroup = "content.opened_right_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.archeuus_door_double_right_blue"
+
+# Lovakengj
+
+[[object]]
+id = "loc.lova_wall_door_lower"
+inherit = "loc.lova_wall_door_lower"
+contentGroup = "content.closed_single_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.lova_wall_door_open_lower"
+
+[[object]]
+id = "loc.lova_wall_door_open_lower"
+inherit = "loc.lova_wall_door_open_lower"
+contentGroup = "content.opened_single_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.lova_wall_door_lower"
+
+[[object]]
+id = "loc.lova_wall_door_lower_m"
+inherit = "loc.lova_wall_door_lower_m"
+contentGroup = "content.closed_single_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.lova_wall_door_open_lower_m"
+
+[[object]]
+id = "loc.lova_wall_door_open_lower_m"
+inherit = "loc.lova_wall_door_open_lower_m"
+contentGroup = "content.opened_single_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.lova_wall_door_lower_m"
+
+[[object]]
+id = "loc.lovaquest_inner_door"
+inherit = "loc.lovaquest_inner_door"
+contentGroup = "content.closed_single_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.lovaquest_inner_door_open"
+
+[[object]]
+id = "loc.lovaquest_inner_door_open"
+inherit = "loc.lovaquest_inner_door_open"
+contentGroup = "content.opened_single_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.lovaquest_inner_door"
+
+# Shayzien (cache names the double door panels mirrored: _double_r is the left panel)
+
+[[object]]
+id = "loc.wallkit_shayzien_door01_l"
+inherit = "loc.wallkit_shayzien_door01_l"
+contentGroup = "content.closed_single_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.wallkit_shayzien_door01_l_open"
+
+[[object]]
+id = "loc.wallkit_shayzien_door01_l_open"
+inherit = "loc.wallkit_shayzien_door01_l_open"
+contentGroup = "content.opened_single_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.wallkit_shayzien_door01_l"
+
+[[object]]
+id = "loc.wallkit_shayzien_door01_r"
+inherit = "loc.wallkit_shayzien_door01_r"
+contentGroup = "content.closed_single_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.wallkit_shayzien_door01_r_open"
+
+[[object]]
+id = "loc.wallkit_shayzien_door01_r_open"
+inherit = "loc.wallkit_shayzien_door01_r_open"
+contentGroup = "content.opened_single_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.wallkit_shayzien_door01_r"
+
+[[object]]
+id = "loc.wallkit_shayzien_door01_l_reverse"
+inherit = "loc.wallkit_shayzien_door01_l_reverse"
+contentGroup = "content.closed_single_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.wallkit_shayzien_door01_l_reverse_open"
+
+[[object]]
+id = "loc.wallkit_shayzien_door01_l_reverse_open"
+inherit = "loc.wallkit_shayzien_door01_l_reverse_open"
+contentGroup = "content.opened_single_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.wallkit_shayzien_door01_l_reverse"
+
+[[object]]
+id = "loc.wallkit_shayzien_door01_r_reverse"
+inherit = "loc.wallkit_shayzien_door01_r_reverse"
+contentGroup = "content.closed_single_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.wallkit_shayzien_door01_r_reverse_open"
+
+[[object]]
+id = "loc.wallkit_shayzien_door01_r_reverse_open"
+inherit = "loc.wallkit_shayzien_door01_r_reverse_open"
+contentGroup = "content.opened_single_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.wallkit_shayzien_door01_r_reverse"
+
+[[object]]
+id = "loc.wallkit_shayzien_door01_double_r"
+inherit = "loc.wallkit_shayzien_door01_double_r"
+contentGroup = "content.closed_left_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.wallkit_shayzien_door01_double_r_open"
+
+[[object]]
+id = "loc.wallkit_shayzien_door01_double_r_open"
+inherit = "loc.wallkit_shayzien_door01_double_r_open"
+contentGroup = "content.opened_left_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.wallkit_shayzien_door01_double_r"
+
+[[object]]
+id = "loc.wallkit_shayzien_door01_double_l"
+inherit = "loc.wallkit_shayzien_door01_double_l"
+contentGroup = "content.closed_right_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.wallkit_shayzien_door01_double_l_open"
+
+[[object]]
+id = "loc.wallkit_shayzien_door01_double_l_open"
+inherit = "loc.wallkit_shayzien_door01_double_l_open"
+contentGroup = "content.opened_right_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.wallkit_shayzien_door01_double_l"
+
+# Elsewhere in Kourend
+
+[[object]]
+id = "loc.fai_barbarian_large_doubledoor_l"
+inherit = "loc.fai_barbarian_large_doubledoor_l"
+contentGroup = "content.closed_left_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.fai_barbarian_open_large_doubledoor_l"
+
+[[object]]
+id = "loc.fai_barbarian_open_large_doubledoor_l"
+inherit = "loc.fai_barbarian_open_large_doubledoor_l"
+contentGroup = "content.opened_left_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.fai_barbarian_large_doubledoor_l"
+
+[[object]]
+id = "loc.fai_barbarian_large_doubledoor_r"
+inherit = "loc.fai_barbarian_large_doubledoor_r"
+contentGroup = "content.closed_right_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.fai_barbarian_open_large_doubledoor_r"
+
+[[object]]
+id = "loc.fai_barbarian_open_large_doubledoor_r"
+inherit = "loc.fai_barbarian_open_large_doubledoor_r"
+contentGroup = "content.opened_right_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.fai_barbarian_large_doubledoor_r"
+
+[[object]]
+id = "loc.fai_varrock_gate_l"
+inherit = "loc.fai_varrock_gate_l"
+contentGroup = "content.closed_left_picketgate"
+
+[object.params]
+"param.next_loc_stage" = "loc.fai_varrock_gate_lc"
+"param.opensound" = "synth.picketgate_open"
+
+[[object]]
+id = "loc.fai_varrock_gate_lc"
+inherit = "loc.fai_varrock_gate_lc"
+contentGroup = "content.opened_left_picketgate"
+
+[object.params]
+"param.next_loc_stage" = "loc.fai_varrock_gate_l"
+"param.closesound" = "synth.picketgate_close"
+
+[[object]]
+id = "loc.fai_varrock_gate_r"
+inherit = "loc.fai_varrock_gate_r"
+contentGroup = "content.closed_right_picketgate"
+
+[object.params]
+"param.next_loc_stage" = "loc.fai_varrock_gate_rc"
+"param.opensound" = "synth.picketgate_open"
+
+[[object]]
+id = "loc.fai_varrock_gate_rc"
+inherit = "loc.fai_varrock_gate_rc"
+contentGroup = "content.opened_right_picketgate"
+
+[object.params]
+"param.next_loc_stage" = "loc.fai_varrock_gate_r"
+"param.closesound" = "synth.picketgate_close"
+
+# Kebos Lowlands
+
+[[object]]
+id = "loc.canafis_door_ground"
+inherit = "loc.canafis_door_ground"
+contentGroup = "content.closed_single_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.canafis_door_ground_open"
+
+[[object]]
+id = "loc.canafis_door_ground_open"
+inherit = "loc.canafis_door_ground_open"
+contentGroup = "content.opened_single_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.canafis_door_ground"
+
+[[object]]
+id = "loc.aide_ornaterailing_gate"
+inherit = "loc.aide_ornaterailing_gate"
+contentGroup = "content.closed_single_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.aide_ornaterailing_gate_open"
+
+[[object]]
+id = "loc.aide_ornaterailing_gate_open"
+inherit = "loc.aide_ornaterailing_gate_open"
+contentGroup = "content.opened_single_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.aide_ornaterailing_gate"
