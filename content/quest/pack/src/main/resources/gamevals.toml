@@ -87,7 +87,7 @@ restless_ghost_coffin_ghost = 123
 restless_skeleton_attack = 124
 
 [gamevals.area]
-demon_slayer_stone_circle = 63800
+demon_slayer_stone_circle = 61
 
 [gamevals.queue]
 demonslayer_delrith_timeout = 63800
