@@ -669,27 +669,6 @@ object AgilityShortcutTables {
                     ),
             ),
             ShortcutDecl(
-                row = "agility_sc_lumbridge_sc_fencejump_jump_over",
-                loc = "loc.lumbridge_sc_fencejump",
-                option = "Jump-over",
-                level = 13,
-                xp = 0.0,
-                ticks = 2,
-                links =
-                    listOf(
-                        LinkDecl(
-                            origin = CoordGrid(3240, 3334, 0),
-                            dest = CoordGrid(3240, 3335, 0),
-                            level = 13,
-                        ),
-                        LinkDecl(
-                            origin = CoordGrid(3240, 3335, 0),
-                            dest = CoordGrid(3240, 3334, 0),
-                            level = 13,
-                        ),
-                    ),
-            ),
-            ShortcutDecl(
                 row = "agility_sc_burthorpe_diary_shortcut_manoeuvre_past",
                 loc = "loc.burthorpe_diary_shortcut",
                 option = "Manoeuvre-past",
@@ -1305,47 +1284,6 @@ object AgilityShortcutTables {
                             origin = CoordGrid(2925, 2949, 0),
                             dest = CoordGrid(2925, 2948, 0),
                             level = 30,
-                        ),
-                    ),
-            ),
-            ShortcutDecl(
-                row = "agility_sc_lumbridge_sc_stepstone_jump_onto",
-                loc = "loc.lumbridge_sc_stepstone",
-                option = "Jump-onto",
-                level = 31,
-                xp = 3.0,
-                ticks = 4,
-                links =
-                    listOf(
-                        LinkDecl(
-                            origin = CoordGrid(3149, 3363, 0),
-                            dest = CoordGrid(3150, 3363, 0),
-                            level = 31,
-                        ),
-                        LinkDecl(
-                            origin = CoordGrid(3150, 3363, 0),
-                            dest = CoordGrid(3151, 3363, 0),
-                            level = 31,
-                        ),
-                        LinkDecl(
-                            origin = CoordGrid(3151, 3363, 0),
-                            dest = CoordGrid(3152, 3363, 0),
-                            level = 31,
-                        ),
-                        LinkDecl(
-                            origin = CoordGrid(3152, 3363, 0),
-                            dest = CoordGrid(3153, 3363, 0),
-                            level = 31,
-                        ),
-                        LinkDecl(
-                            origin = CoordGrid(3153, 3363, 0),
-                            dest = CoordGrid(3152, 3363, 0),
-                            level = 31,
-                        ),
-                        LinkDecl(
-                            origin = CoordGrid(3154, 3363, 0),
-                            dest = CoordGrid(3153, 3363, 0),
-                            level = 31,
                         ),
                     ),
             ),
@@ -3036,37 +2974,6 @@ object AgilityShortcutTables {
                             origin = CoordGrid(3425, 3484, 0),
                             dest = CoordGrid(3425, 3483, 0),
                             level = 65,
-                        ),
-                    ),
-            ),
-            ShortcutDecl(
-                row = "agility_sc_lumbridge_diary_desert_shortcut_jump_to",
-                loc = "loc.lumbridge_diary_desert_shortcut",
-                option = "Jump-to",
-                level = 66,
-                xp = 0.0,
-                ticks = 3,
-                links =
-                    listOf(
-                        LinkDecl(
-                            origin = CoordGrid(3212, 3137, 0),
-                            dest = CoordGrid(3214, 3132, 0),
-                            level = 66,
-                        ),
-                        LinkDecl(
-                            origin = CoordGrid(3212, 3138, 0),
-                            dest = CoordGrid(3214, 3131, 0),
-                            level = 66,
-                        ),
-                        LinkDecl(
-                            origin = CoordGrid(3214, 3131, 0),
-                            dest = CoordGrid(3212, 3138, 0),
-                            level = 66,
-                        ),
-                        LinkDecl(
-                            origin = CoordGrid(3214, 3132, 0),
-                            dest = CoordGrid(3212, 3137, 0),
-                            level = 66,
                         ),
                     ),
             ),
