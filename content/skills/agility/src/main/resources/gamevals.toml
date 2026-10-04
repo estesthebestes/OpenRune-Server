@@ -1,7 +1,7 @@
 [gamevals.varp]
-agility_course = 65478
-agility_course_progress = 65477
-agility_mark_clock = 65476
+agility_course = 65408
+agility_course_progress = 65407
+agility_mark_clock = 65406
 
 [gamevals.dbtable]
 agility_course = 65483

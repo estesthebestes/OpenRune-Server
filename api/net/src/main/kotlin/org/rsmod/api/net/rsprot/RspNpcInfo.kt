@@ -43,6 +43,14 @@ class RspNpcInfo(val rspAvatar: NpcAvatar) : NpcInfoProtocol {
         rspAvatar.extendedInfo.setBodyCustomisation(listOf(model), emptyList(), emptyList())
     }
 
+    override fun setBodyModels(models: List<Int>) {
+        rspAvatar.extendedInfo.setBodyCustomisation(models, emptyList(), emptyList())
+    }
+
+    override fun setBodyRecolours(recolours: List<Int>) {
+        rspAvatar.extendedInfo.setBodyCustomisation(emptyList(), recolours, emptyList())
+    }
+
     override fun resetBodyModel() {
         rspAvatar.extendedInfo.resetBodyCustomisations()
     }
@@ -57,6 +65,10 @@ class RspNpcInfo(val rspAvatar: NpcAvatar) : NpcInfoProtocol {
             startTime = headbar.startTime,
             endTime = headbar.endTime,
         )
+    }
+
+    override fun removeHeadbar(id: Int) {
+        rspAvatar.extendedInfo.removeHeadBar(id)
     }
 
     override fun showHitmark(hitmark: Hitmark) {

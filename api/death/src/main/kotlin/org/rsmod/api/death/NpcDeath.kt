@@ -79,7 +79,7 @@ constructor(
                     val spawned = objRepo.add(droppedRemains, dropCoords, duration, hero)
                     ClientScripts.lootTrackerAddLoot(
                         hero,
-                        id,
+                        visType.id,
                         lootTrackerEventId,
                         spawned.type,
                         spawned.count,
@@ -92,6 +92,7 @@ constructor(
                     hero = hero,
                     npc = this,
                     lootTrackerEventId = lootTrackerEventId,
+                    dropCoords = dropCoords,
                 )
             for (hook in deathKillHooks) {
                 hook.onKill(killCtx)

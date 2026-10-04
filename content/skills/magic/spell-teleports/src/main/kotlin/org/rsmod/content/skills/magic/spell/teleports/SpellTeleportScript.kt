@@ -8,10 +8,10 @@ import dev.openrune.types.ItemServerType
 import dev.openrune.types.aconverted.interf.IfButtonOp
 import jakarta.inject.Inject
 import org.rsmod.api.area.checker.AreaChecker
-import org.rsmod.api.config.refs.params
 import org.rsmod.api.combat.commons.magic.MagicSpell
 import org.rsmod.api.combat.manager.MagicRuneManager
 import org.rsmod.api.combat.manager.MagicRuneManager.Companion.isFailure
+import org.rsmod.api.config.refs.params
 import org.rsmod.api.invtx.invTransaction
 import org.rsmod.api.invtx.select
 import org.rsmod.api.player.hook.PlayerTeleportValidator
@@ -23,7 +23,7 @@ import org.rsmod.api.player.protect.ProtectedAccess
 import org.rsmod.api.script.onIfOverlayButton
 import org.rsmod.api.script.onPlayerQueueWithArgs
 import org.rsmod.api.spells.MagicSpellRegistry
-import org.rsmod.content.quest.manager.Quest
+import org.rsmod.content.quest.manager.QuestRequirements
 import org.rsmod.game.inv.isType
 import org.rsmod.map.CoordGrid
 import org.rsmod.plugin.scripts.PluginScript
@@ -38,7 +38,7 @@ constructor(
     private val areaChecker: AreaChecker,
 ) : PluginScript() {
     override fun ScriptContext.startup() {
-        for (teleport in StandardSpellTeleport.entries) {
+        for (teleport in SpellTeleport.entries) {
             val spell = teleport.resolveSpell() ?: continue
             onIfOverlayButton(spell.component) { castSpellTeleport(spell, teleport, it.op) }
         }
@@ -47,14 +47,14 @@ constructor(
         }
     }
 
-    private fun StandardSpellTeleport.resolveSpell(): MagicSpell? {
+    private fun SpellTeleport.resolveSpell(): MagicSpell? {
         val spellObj = ServerCacheManager.getItem(spellObj.asRSCM(RSCMType.OBJ)) ?: return null
         return spells.getObjSpell(spellObj)
     }
 
     private suspend fun ProtectedAccess.castSpellTeleport(
         spell: MagicSpell,
-        teleport: StandardSpellTeleport,
+        teleport: SpellTeleport,
         op: IfButtonOp,
     ) {
         if (actionDelay > mapClock) {
@@ -80,9 +80,10 @@ constructor(
             return
         }
 
+        val style = teleport.style
         actionDelay = mapClock + TeleportActionDelay
-        anim(TeleportStartAnim)
-        spotanim(TeleportSpotanim, height = TeleportSpotanimHeight)
+        anim(style.startAnim)
+        spotanim(style.spotanim, height = style.spotanimHeight)
         soundSynth(TeleportSound)
         clearQueue(TeleportQueue)
         queue(TeleportQueue, TeleportDelay, PendingSpellTeleport(teleport, destination.packed))
@@ -94,7 +95,8 @@ constructor(
             return
         }
         telejump(CoordGrid(task.destination))
-        anim(TeleportEndAnim)
+        val endAnim = task.teleport.style.endAnim
+        if (endAnim != null) anim(endAnim) else resetAnim()
         statAdvance("stat.magic", spell.castXp)
     }
 
@@ -111,10 +113,10 @@ constructor(
 
     private fun ProtectedAccess.consumeRequirements(
         spell: MagicSpell,
-        teleport: StandardSpellTeleport,
+        teleport: SpellTeleport,
     ): Boolean {
         val castSpell =
-            if (teleport == StandardSpellTeleport.ApeAtoll) {
+            if (teleport == SpellTeleport.ApeAtoll) {
                 val banana = ServerCacheManager.getItem(Banana.asRSCM(RSCMType.OBJ)) ?: return false
                 val spellWithoutBanana = spell.copy(objReqs = spell.objReqs.withoutBananaReq())
                 if (!runes.canCastSpell(player, spellWithoutBanana)) {
@@ -158,11 +160,11 @@ constructor(
     }
 
     private data class PendingSpellTeleport(
-        val teleport: StandardSpellTeleport,
+        val teleport: SpellTeleport,
         val destination: Int,
     )
 
-    private enum class StandardSpellTeleport(
+    private enum class SpellTeleport(
         val spellObj: String,
         val destination: CoordGrid? = null,
         val destinationLevel: Int? = null,
@@ -170,6 +172,7 @@ constructor(
         val requiredQuest: String? = null,
         val lockedMessage: String = "You need to complete the required quest to cast this spell.",
         val missingDestinationMessage: String = "That teleport is not implemented yet.",
+        val style: TeleportStyle = TeleportStyle.Standard,
     ) {
         Home(
             "obj.48_home_teleport",
@@ -246,6 +249,66 @@ constructor(
             requiredQuest = "quest_pandemonium",
             lockedMessage = "You need to complete Pandemonium to cast this spell.",
             missingDestinationMessage = "Boat teleports need boat-location support before they can be cast.",
+        ),
+        EdgevilleHome("obj.01_zaros_home_tele", CoordGrid(3087, 3496, 0), style = TeleportStyle.Ancient),
+        Paddewwa("obj.54_paddewwa_teleport", style = TeleportStyle.Ancient),
+        Senntisten("obj.60_senntisten_teleport", style = TeleportStyle.Ancient),
+        Kharyrll("obj.66_kharyllyl_teleport", style = TeleportStyle.Ancient),
+        Lassar("obj.72_lassar_teleport", style = TeleportStyle.Ancient),
+        Dareeyak("obj.78_dareeyak_teleport", style = TeleportStyle.Ancient),
+        Carrallanger("obj.84_carrallagar_teleport", style = TeleportStyle.Ancient),
+        Annakarl("obj.90_annakarl_teleport", style = TeleportStyle.Ancient),
+        Ghorrock("obj.96_ghorrock_teleport", style = TeleportStyle.Ancient),
+        ArceuusHome(
+            "obj.deadman_level99_lamp",
+            CoordGrid(1699, 3879, 0),
+            style = TeleportStyle.Arceuus,
+        ),
+        ArceuusLibrary("obj.br_mithril_platebody", style = TeleportStyle.Arceuus),
+        DraynorManor("obj.br_mithril_platelegs", style = TeleportStyle.Arceuus),
+        Battlefront("obj.23_teleport_battlefront", style = TeleportStyle.Arceuus),
+        MindAltar("obj.br_greendhide_body", style = TeleportStyle.Arceuus),
+        Respawn(
+            "obj.poh_guide_guildtrophy",
+            CoordGrid(3221, 3218, 0),
+            style = TeleportStyle.Arceuus,
+        ),
+        SalveGraveyard(
+            "obj.br_greendhide_chaps",
+            requiredQuest = "quest_priestinperil",
+            lockedMessage = "You need to complete Priest in Peril to cast this spell.",
+            style = TeleportStyle.Arceuus,
+        ),
+        FenkenstrainsCastle(
+            "obj.br_moonclan_body",
+            requiredQuest = "quest_priestinperil",
+            lockedMessage = "You need to complete Priest in Peril to cast this spell.",
+            style = TeleportStyle.Arceuus,
+        ),
+        WestArdougne(
+            "obj.br_moonclan_legs",
+            requiredQuest = "quest_biohazard",
+            lockedMessage = "You need to complete Biohazard to cast this spell.",
+            style = TeleportStyle.Arceuus,
+        ),
+        HarmonyIsland(
+            "obj.br_xeric_body",
+            requiredQuest = "quest_greatbrainrobbery",
+            lockedMessage = "You need to complete The Great Brain Robbery to cast this spell.",
+            style = TeleportStyle.Arceuus,
+        ),
+        Cemetery("obj.br_xeric_legs", style = TeleportStyle.Arceuus),
+        Barrows(
+            "obj.br_air_staff",
+            requiredQuest = "quest_priestinperil",
+            lockedMessage = "You need to complete Priest in Peril to cast this spell.",
+            style = TeleportStyle.Arceuus,
+        ),
+        ArceuusApeAtoll(
+            "obj.br_dragon_helm",
+            requiredQuest = "quest_monkeymadness1",
+            lockedMessage = "You need to complete Monkey Madness I to cast this spell.",
+            style = TeleportStyle.Arceuus,
         );
 
         fun option(op: IfButtonOp): TeleportOption {
@@ -268,8 +331,7 @@ constructor(
 
         fun canCast(access: ProtectedAccess): Boolean {
             val questKey = requiredQuest ?: return true
-            val quest = Quest.get(questKey)
-            if (quest?.isQuestCompleted(access.player) == true) {
+            if (QuestRequirements.hasCompleted(access.player, questKey)) {
                 return true
             }
             access.mes(lockedMessage)
@@ -283,14 +345,36 @@ constructor(
         val missingDestinationMessage: String = "That teleport is not implemented yet.",
     )
 
+    private enum class TeleportStyle(
+        val startAnim: String,
+        val endAnim: String?,
+        val spotanim: String,
+        val spotanimHeight: Int,
+    ) {
+        Standard(
+            startAnim = RSCM.getReverseMapping(RSCMType.SEQ, 714),
+            endAnim = RSCM.getReverseMapping(RSCMType.SEQ, 715),
+            spotanim = RSCM.getReverseMapping(RSCMType.SPOTANIM, 111),
+            spotanimHeight = 92,
+        ),
+        Ancient(
+            startAnim = "seq.zaros_vertical_casting",
+            endAnim = null,
+            spotanim = "spotanim.zaros_teleport",
+            spotanimHeight = 0,
+        ),
+        Arceuus(
+            startAnim = "seq.arceuus_necromancy_anim",
+            endAnim = null,
+            spotanim = "spotanim.arceuus_teleport_spotanim",
+            spotanimHeight = 0,
+        ),
+    }
+
     private companion object {
-        private val TeleportStartAnim = RSCM.getReverseMapping(RSCMType.SEQ, 714)
-        private val TeleportEndAnim = RSCM.getReverseMapping(RSCMType.SEQ, 715)
-        private val TeleportSpotanim = RSCM.getReverseMapping(RSCMType.SPOTANIM, 111)
         private const val Banana = "obj.banana"
         private const val TeleportQueue = "queue.spell_teleport"
         private const val TeleportSound = "synth.teleport_all"
-        private const val TeleportSpotanimHeight = 92
         private const val TeleportDelay = 4
         private const val TeleportActionDelay = 5
     }
