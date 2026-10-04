@@ -1,0 +1,12 @@
+[[varbit]]
+isServerOnly = true
+id = "varbit.monks_friend_progress"
+varp = "varp.drunkmonkquest"
+startBit = 0
+endBit = 6
+
+[[varp]]
+isServerOnly = true
+id = "varp.monks_friend_party_end"
+scope = "Temp"
+transmit = "Never"
