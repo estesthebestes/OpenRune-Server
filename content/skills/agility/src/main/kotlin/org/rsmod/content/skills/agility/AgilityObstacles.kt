@@ -14,6 +14,11 @@ import org.rsmod.api.player.stat.baseAgilityLvl
 import org.rsmod.api.player.stat.hitpoints
 import org.rsmod.api.player.vars.intVarp
 import org.rsmod.api.repo.obj.ObjRepository
+import org.rsmod.api.script.onApLoc1
+import org.rsmod.api.script.onApLoc2
+import org.rsmod.api.script.onApLoc3
+import org.rsmod.api.script.onApLoc4
+import org.rsmod.api.script.onApLoc5
 import org.rsmod.api.script.onOpLoc1
 import org.rsmod.api.script.onOpLoc2
 import org.rsmod.api.script.onOpLoc3
@@ -68,12 +73,24 @@ constructor(
     ) {
         val type = ServerCacheManager.getObject(locId(loc) ?: return) ?: return
         val slot = (1..5).firstOrNull { !type.actions.getOpOrNull(it - 1).isNullOrBlank() } ?: return
+        // Obstacles operated across a wall edge can never be "reached", so they trigger on approach.
+        val approachRange = mapOf("loc.rooftops_kharid_bamboo_tree_top" to 1)[loc]
+        if (approachRange == null) {
+            when (slot) {
+                1 -> onOpLoc1(loc) { action(it.loc) }
+                2 -> onOpLoc2(loc) { action(it.loc) }
+                3 -> onOpLoc3(loc) { action(it.loc) }
+                4 -> onOpLoc4(loc) { action(it.loc) }
+                else -> onOpLoc5(loc) { action(it.loc) }
+            }
+            return
+        }
         when (slot) {
-            1 -> onOpLoc1(loc) { action(it.loc) }
-            2 -> onOpLoc2(loc) { action(it.loc) }
-            3 -> onOpLoc3(loc) { action(it.loc) }
-            4 -> onOpLoc4(loc) { action(it.loc) }
-            else -> onOpLoc5(loc) { action(it.loc) }
+            1 -> onApLoc1(loc) { if (isWithinApRange(it.loc, approachRange)) action(it.loc) }
+            2 -> onApLoc2(loc) { if (isWithinApRange(it.loc, approachRange)) action(it.loc) }
+            3 -> onApLoc3(loc) { if (isWithinApRange(it.loc, approachRange)) action(it.loc) }
+            4 -> onApLoc4(loc) { if (isWithinApRange(it.loc, approachRange)) action(it.loc) }
+            else -> onApLoc5(loc) { if (isWithinApRange(it.loc, approachRange)) action(it.loc) }
         }
     }
 
