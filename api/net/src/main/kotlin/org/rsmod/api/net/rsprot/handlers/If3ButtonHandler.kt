@@ -61,6 +61,9 @@ constructor(private val eventBus: EventBus, private val protectedAccess: Protect
         val opEnabled =
             InterfaceEvents.isEnabled(player.ui, componentType, comsub, buttonOp.toIfEvent())
         if (!opEnabled) {
+            if (player.componentClickDebug) {
+                player.mes("[componentdebug] blocked: $buttonOp is not enabled for comsub=$comsub")
+            }
             return
         }
 
