@@ -16288,3 +16288,100 @@ defaultMode = "None"
 id = "npc.leviathan_tail_ring_3"
 inherit = "npc.leviathan_tail_ring_3"
 defaultMode = "None"
+
+# Great Kourend and Kebos bankers
+
+[[npc]]
+id = "npc.arceuus_banker_1_east"
+inherit = "npc.arceuus_banker_1_east"
+contentGroup = "content.banker"
+
+[[npc]]
+id = "npc.arceuus_banker_1_west"
+inherit = "npc.arceuus_banker_1_west"
+contentGroup = "content.banker"
+
+[[npc]]
+id = "npc.arceuus_banker_2_east"
+inherit = "npc.arceuus_banker_2_east"
+contentGroup = "content.banker"
+
+[[npc]]
+id = "npc.arceuus_banker_2_west"
+inherit = "npc.arceuus_banker_2_west"
+contentGroup = "content.banker"
+
+[[npc]]
+id = "npc.banker1"
+inherit = "npc.banker1"
+contentGroup = "content.banker"
+
+[[npc]]
+id = "npc.farming_guild_banker1"
+inherit = "npc.farming_guild_banker1"
+contentGroup = "content.banker"
+
+[[npc]]
+id = "npc.farming_guild_banker2"
+inherit = "npc.farming_guild_banker2"
+contentGroup = "content.banker"
+
+[[npc]]
+id = "npc.hosidius_banker_f_east"
+inherit = "npc.hosidius_banker_f_east"
+contentGroup = "content.banker"
+
+[[npc]]
+id = "npc.hosidius_banker_m_east"
+inherit = "npc.hosidius_banker_m_east"
+contentGroup = "content.banker"
+
+[[npc]]
+id = "npc.lovakengj_banker_f_east"
+inherit = "npc.lovakengj_banker_f_east"
+contentGroup = "content.banker"
+
+[[npc]]
+id = "npc.lovakengj_banker_f_north"
+inherit = "npc.lovakengj_banker_f_north"
+contentGroup = "content.banker"
+
+[[npc]]
+id = "npc.lovakengj_banker_f_south"
+inherit = "npc.lovakengj_banker_f_south"
+contentGroup = "content.banker"
+
+[[npc]]
+id = "npc.lovakengj_banker_f_west"
+inherit = "npc.lovakengj_banker_f_west"
+contentGroup = "content.banker"
+
+[[npc]]
+id = "npc.lovakengj_banker_m_east"
+inherit = "npc.lovakengj_banker_m_east"
+contentGroup = "content.banker"
+
+[[npc]]
+id = "npc.lovakengj_banker_m_south"
+inherit = "npc.lovakengj_banker_m_south"
+contentGroup = "content.banker"
+
+[[npc]]
+id = "npc.piscarilius_banker_1"
+inherit = "npc.piscarilius_banker_1"
+contentGroup = "content.banker"
+
+[[npc]]
+id = "npc.piscarilius_banker_2"
+inherit = "npc.piscarilius_banker_2"
+contentGroup = "content.banker"
+
+[[npc]]
+id = "npc.shayzien_banker_f_east"
+inherit = "npc.shayzien_banker_f_east"
+contentGroup = "content.banker"
+
+[[npc]]
+id = "npc.shayzien_banker_m_east"
+inherit = "npc.shayzien_banker_m_east"
+contentGroup = "content.banker"
