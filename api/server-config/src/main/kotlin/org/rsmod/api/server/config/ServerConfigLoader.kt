@@ -22,6 +22,11 @@ public class ServerConfigLoader {
 
     public fun load(file: Path): ServerConfig {
         migrateWorldBeforeLoad(file)
+        return read(file)
+    }
+
+    /** Parses and validates [file] without migrating it, so the file on disk is never written. */
+    public fun read(file: Path): ServerConfig {
         val config = yamlMapper.readValue(file.toFile(), ServerConfig::class.java)
         SameInstanceCentralConfigValidation.validateAfterLoad(file, config)
         return config
