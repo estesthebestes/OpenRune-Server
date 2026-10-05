@@ -1,9 +1,12 @@
 package org.rsmod.content.other.consumables.potion
 
+import dev.openrune.rscm.RSCM.asRSCM
+import dev.openrune.rscm.RSCMType
 import dev.openrune.types.ItemServerType
 import jakarta.inject.Inject
 import org.rsmod.api.area.checker.AreaChecker
 import org.rsmod.api.area.checker.isInWilderness
+import org.rsmod.api.invtx.invDel
 import org.rsmod.api.player.protect.ProtectedAccess
 import org.rsmod.api.script.onOpHeld1
 import org.rsmod.api.script.onOpHeld2
@@ -211,15 +214,23 @@ constructor(
             potion.items.getOrNull(doseIndex + 1)
                 ?: potion.empty
 
-        val transaction =
-            invReplaceSlot(
-                inv = inventory,
-                slot = slot,
-                count = 1,
-                replacement = replacement,
-            )
+        val smashVial =
+            replacement.id == emptyVialId &&
+                vars[AUTO_SMASH_VIALS] == 1
 
-        if (transaction.failure) {
+        val failed =
+            if (smashVial) {
+                player.invDel(inventory, obj = type.id, count = 1, slot = slot).failure
+            } else {
+                invReplaceSlot(
+                    inv = inventory,
+                    slot = slot,
+                    count = 1,
+                    replacement = replacement,
+                ).failure
+            }
+
+        if (failed) {
             return
         }
 
@@ -255,6 +266,11 @@ constructor(
                 consumedIndex = doseIndex,
             ),
         )
+
+        if (smashVial) {
+            soundSynth(VIAL_SMASH_SOUND)
+            mes("You quickly smash the empty vial using the trick a Barbarian taught you.")
+        }
     }
 
     private fun remainingDoseMessage(
@@ -340,6 +356,14 @@ constructor(
     private companion object {
         const val DRINK_SOUND: Int =
             2401
+
+        const val VIAL_SMASH_SOUND: String =
+            "synth.glass_break"
+
+        const val AUTO_SMASH_VIALS: String =
+            "varbit.auto_smash_vials"
+
+        val emptyVialId: Int by lazy { "obj.vial_empty".asRSCM(RSCMType.OBJ) }
 
         const val DRINK_ANIMATION: String =
             "seq.human_eat"

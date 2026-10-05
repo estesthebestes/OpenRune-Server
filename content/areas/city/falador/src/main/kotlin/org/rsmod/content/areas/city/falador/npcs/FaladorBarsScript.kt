@@ -7,13 +7,19 @@ import org.rsmod.api.invtx.invDel
 import org.rsmod.api.invtx.invTakeFee
 import org.rsmod.api.player.dialogue.Dialogue
 import org.rsmod.api.repo.obj.ObjRepository
+import org.rsmod.content.quest.area.barbarianoutpost.barcrawl.BarcrawlBar
+import org.rsmod.content.quest.area.barbarianoutpost.barcrawl.BarcrawlQuest
+import org.rsmod.content.quest.manager.menu
 import org.rsmod.game.entity.Npc
 import org.rsmod.map.CoordGrid
 import org.rsmod.plugin.scripts.PluginScript
 import org.rsmod.plugin.scripts.ScriptContext
 
 /** The Rising Sun Inn barmaids and the Party Room's bar staff. */
-class FaladorBarsScript @Inject constructor(private val objRepo: ObjRepository) : PluginScript() {
+class FaladorBarsScript
+@Inject
+constructor(private val objRepo: ObjRepository, private val barcrawl: BarcrawlQuest) :
+    PluginScript() {
     override fun ScriptContext.startup() {
         for ((npc, name) in RISING_SUN_BARMAIDS) {
             val counter = if (npc == TINA) null else RISING_SUN_BAR
@@ -26,14 +32,20 @@ class FaladorBarsScript @Inject constructor(private val objRepo: ObjRepository) 
     private suspend fun Dialogue.risingSunBarmaid(name: String) {
         chatNpc(happy, "Heya! What can I get you?")
         val glasses = player.inv.count(BEER_GLASS)
-        if (glasses == 0) {
-            servingAles(name)
-            return
-        }
         val glassOption = if (glasses == 1) "I've got this beer glass..." else "I've got these beer glasses..."
-        if (choice2("What ales are you serving?", true, glassOption, false)) {
-            servingAles(name)
-            return
+        val options = buildList {
+            add("What ales are you serving?" to BarmaidTopic.Ales)
+            if (glasses > 0) {
+                add(glassOption to BarmaidTopic.Glasses)
+            }
+            if (barcrawl.canServe(player, BarcrawlBar.RisingSun)) {
+                add(BarcrawlQuest.BARCRAWL_LINE to BarmaidTopic.Barcrawl)
+            }
+        }
+        when (menu(options)) {
+            BarmaidTopic.Ales -> return servingAles(name)
+            BarmaidTopic.Barcrawl -> return with(barcrawl) { serve(BarcrawlBar.RisingSun, name) }
+            BarmaidTopic.Glasses -> {}
         }
         chatPlayer(neutral, glassOption)
         if (glasses == 1) {
@@ -143,6 +155,12 @@ class FaladorBarsScript @Inject constructor(private val objRepo: ObjRepository) 
         access.delay(CHEER_CYCLES)
         access.anim(SEQ_BOW)
         npc.anim(SEQ_BOW)
+    }
+
+    private enum class BarmaidTopic {
+        Ales,
+        Glasses,
+        Barcrawl,
     }
 
     private companion object {

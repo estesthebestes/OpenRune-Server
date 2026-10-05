@@ -1,0 +1,82 @@
+[[varbit]]
+isServerOnly = true
+id = "varbit.barcrawl_stage"
+varp = "varp.barcrawl"
+startBit = 0
+endBit = 1
+
+[[varp]]
+isServerOnly = true
+id = "varp.barcrawl_state"
+scope = "Perm"
+transmit = "Never"
+
+[[varbit]]
+isServerOnly = true
+id = "varbit.barcrawl_signed_blue_moon"
+varp = "varp.barcrawl_state"
+startBit = 0
+endBit = 0
+
+[[varbit]]
+isServerOnly = true
+id = "varbit.barcrawl_signed_blurberry"
+varp = "varp.barcrawl_state"
+startBit = 1
+endBit = 1
+
+[[varbit]]
+isServerOnly = true
+id = "varbit.barcrawl_signed_dead_mans_chest"
+varp = "varp.barcrawl_state"
+startBit = 2
+endBit = 2
+
+[[varbit]]
+isServerOnly = true
+id = "varbit.barcrawl_signed_dragon_inn"
+varp = "varp.barcrawl_state"
+startBit = 3
+endBit = 3
+
+[[varbit]]
+isServerOnly = true
+id = "varbit.barcrawl_signed_flying_horse"
+varp = "varp.barcrawl_state"
+startBit = 4
+endBit = 4
+
+[[varbit]]
+isServerOnly = true
+id = "varbit.barcrawl_signed_foresters_arms"
+varp = "varp.barcrawl_state"
+startBit = 5
+endBit = 5
+
+[[varbit]]
+isServerOnly = true
+id = "varbit.barcrawl_signed_jolly_boar"
+varp = "varp.barcrawl_state"
+startBit = 6
+endBit = 6
+
+[[varbit]]
+isServerOnly = true
+id = "varbit.barcrawl_signed_karamja_spirits"
+varp = "varp.barcrawl_state"
+startBit = 7
+endBit = 7
+
+[[varbit]]
+isServerOnly = true
+id = "varbit.barcrawl_signed_rising_sun"
+varp = "varp.barcrawl_state"
+startBit = 8
+endBit = 8
+
+[[varbit]]
+isServerOnly = true
+id = "varbit.barcrawl_signed_rusty_anchor"
+varp = "varp.barcrawl_state"
+startBit = 9
+endBit = 9

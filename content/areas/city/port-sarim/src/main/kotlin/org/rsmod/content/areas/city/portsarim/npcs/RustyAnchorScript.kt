@@ -1,13 +1,16 @@
 package org.rsmod.content.areas.city.portsarim.npcs
 
+import jakarta.inject.Inject
 import org.rsmod.api.config.Constants
 import org.rsmod.api.player.dialogue.Dialogue
 import org.rsmod.api.script.onOpNpc1
+import org.rsmod.content.quest.area.barbarianoutpost.barcrawl.BarcrawlBar
+import org.rsmod.content.quest.area.barbarianoutpost.barcrawl.BarcrawlQuest
 import org.rsmod.content.quest.manager.QuestRequirements
 import org.rsmod.plugin.scripts.PluginScript
 import org.rsmod.plugin.scripts.ScriptContext
 
-class RustyAnchorScript : PluginScript() {
+class RustyAnchorScript @Inject constructor(private val barcrawl: BarcrawlQuest) : PluginScript() {
     override fun ScriptContext.startup() {
         onOpNpc1("npc.redbeard_frank") { startDialogue(it.npc) { redbeardFrank() } }
         onOpNpc1("npc.sarim_pub_sitting_patron") { startDialogue(it.npc) { ahab() } }
@@ -94,7 +97,19 @@ class RustyAnchorScript : PluginScript() {
     }
 
     private suspend fun Dialogue.bartender() {
-        if (choice2("Could I buy a beer please?", true, "Have you heard any rumours here?", false)) {
+        val options = buildList {
+            add("Could I buy a beer please?" to BarTopic.Beer)
+            add("Have you heard any rumours here?" to BarTopic.Rumours)
+            if (barcrawl.canServe(player, BarcrawlBar.RustyAnchor)) {
+                add(BarcrawlQuest.BARCRAWL_LINE to BarTopic.Barcrawl)
+            }
+        }
+        val topic = menu(options)
+        if (topic == BarTopic.Barcrawl) {
+            with(barcrawl) { serve(BarcrawlBar.RustyAnchor) }
+            return
+        }
+        if (topic == BarTopic.Beer) {
             chatPlayer(happy, "Could I buy a beer please?")
             chatNpc(happy, "Sure, that will be $BEER_PRICE gold coins please.")
             val inv = access.inv
@@ -251,6 +266,12 @@ class RustyAnchorScript : PluginScript() {
         Arrr,
         SitAllDay,
         Trade,
+    }
+
+    private enum class BarTopic {
+        Beer,
+        Rumours,
+        Barcrawl,
     }
 
     private enum class DrinkerTopic {

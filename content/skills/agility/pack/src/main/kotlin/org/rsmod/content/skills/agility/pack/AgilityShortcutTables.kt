@@ -1393,7 +1393,7 @@ object AgilityShortcutTables {
                 loc = "loc.agility_obstical_pipe_barbarian",
                 option = "Squeeze-through",
                 level = 35,
-                xp = 0.0,
+                xp = 10.0,
                 ticks = 5,
                 links =
                     listOf(
