@@ -2,7 +2,6 @@ package org.rsmod.content.skills.agility
 
 import dev.openrune.ServerCacheManager
 import dev.openrune.cache.MAPS
-import dev.openrune.types.ObjectServerType
 import dev.openrune.filesystem.Cache
 import dev.openrune.map.GameMapBuilder
 import dev.openrune.map.GameMapDecoder
@@ -10,6 +9,7 @@ import dev.openrune.map.loc.MapLocListDecoder
 import dev.openrune.map.tile.MapTileDecoder
 import dev.openrune.map.util.InlineByteBuf
 import dev.openrune.rscm.RSCM.asRSCM
+import dev.openrune.types.ObjectServerType
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
