@@ -27,8 +27,8 @@ import org.rsmod.api.grandexchange.rules.GeTax
 import org.rsmod.api.inv.storage.PlayerItemStorage
 import org.rsmod.api.invtx.InvTransactionsScript
 import org.rsmod.api.player.dialogue.align.TextAlignment
-import org.rsmod.api.player.ironman.PlayerGamemode
 import org.rsmod.api.player.input.ResumePauseButtonInput
+import org.rsmod.api.player.ironman.PlayerGamemode
 import org.rsmod.api.player.protect.ProtectedAccess
 import org.rsmod.api.player.protect.ProtectedAccessContextFactory
 import org.rsmod.api.player.protect.clearPendingAction

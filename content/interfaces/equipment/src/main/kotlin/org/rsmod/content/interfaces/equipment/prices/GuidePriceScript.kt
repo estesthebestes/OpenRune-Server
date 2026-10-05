@@ -1,6 +1,5 @@
 package org.rsmod.content.interfaces.equipment.prices
 
-import dev.openrune.ServerCacheManager
 import dev.openrune.definition.type.widget.IfEvent
 import dev.openrune.rscm.RSCM
 import dev.openrune.rscm.RSCMType
@@ -163,7 +162,7 @@ constructor(
     private suspend fun ProtectedAccess.searchObj() {
         val search = objDialog("Select an item to ask about its price:")
 
-        val searchInternalName = RSCM.getReverseMapping(RSCMType.OBJ,search.id)
+        val searchInternalName = RSCM.getReverseMapping(RSCMType.OBJ, search.id)
 
         ifSetObj("component.ge_pricechecker:otheritem", searchInternalName, zoom = 1)
         player.updateSearchPrice(search)
