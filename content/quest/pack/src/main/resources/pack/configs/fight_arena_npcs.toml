@@ -1,0 +1,76 @@
+[[npc]]
+id = "npc.arena_ogre"
+inherit = "npc.arena_ogre"
+[npc.params]
+"param.attack_anim" = "seq.ogre_attack"
+"param.defend_anim" = "seq.ogre_block"
+"param.death_anim" = "seq.ogre_death"
+"param.npc_attack_type" = "category.attacktype_crush"
+
+[[npc]]
+id = "npc.arena_scorpion"
+inherit = "npc.arena_scorpion"
+[npc.params]
+"param.elemental_weakness_type" = 3
+"param.elemental_weakness_percent" = 25
+"param.attack_anim" = "seq.scorpion_update_attack_tail"
+"param.defend_anim" = "seq.scorpion_update_defend"
+"param.death_anim" = "seq.scorpion_update_death"
+"param.npc_attack_type" = "category.attacktype_stab"
+
+[[npc]]
+id = "npc.arena_bouncer"
+inherit = "npc.arena_bouncer"
+[npc.params]
+"param.attack_anim" = "seq.dog_update_fight_arena_attack"
+"param.defend_anim" = "seq.dog_update_fight_arena_defend"
+"param.death_anim" = "seq.dog_update_hellhound_godwars_death"
+"param.npc_attack_type" = "category.attacktype_slash"
+
+[[npc]]
+id = "npc.general_khazard"
+inherit = "npc.general_khazard"
+[npc.params]
+"param.attack_anim" = "seq.human_sword_slash"
+"param.defend_anim" = "seq.human_sword_block"
+"param.npc_attack_type" = "category.attacktype_slash"
+
+[[npc]]
+id = "npc.arena_guard1"
+inherit = "npc.arena_guard1"
+[npc.params]
+"param.attack_anim" = "seq.human_sword_slash"
+"param.defend_anim" = "seq.human_sword_block"
+"param.npc_attack_type" = "category.attacktype_slash"
+
+[[npc]]
+id = "npc.arena_guard4"
+inherit = "npc.arena_guard4"
+[npc.params]
+"param.attack_anim" = "seq.human_sword_slash"
+"param.defend_anim" = "seq.human_sword_block"
+"param.npc_attack_type" = "category.attacktype_slash"
+
+[[npc]]
+id = "npc.arena_guard5"
+inherit = "npc.arena_guard5"
+[npc.params]
+"param.attack_anim" = "seq.human_sword_slash"
+"param.defend_anim" = "seq.human_sword_block"
+"param.npc_attack_type" = "category.attacktype_slash"
+
+[[npc]]
+id = "npc.arena_guard6"
+inherit = "npc.arena_guard6"
+[npc.params]
+"param.attack_anim" = "seq.human_sword_slash"
+"param.defend_anim" = "seq.human_sword_block"
+"param.npc_attack_type" = "category.attacktype_slash"
+
+[[npc]]
+id = "npc.arena_guard7"
+inherit = "npc.arena_guard7"
+[npc.params]
+"param.attack_anim" = "seq.human_sword_slash"
+"param.defend_anim" = "seq.human_sword_block"
+"param.npc_attack_type" = "category.attacktype_slash"
