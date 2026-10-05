@@ -1,9 +1,6 @@
 package org.rsmod.content.interfaces.grandexchange
 
-import dev.openrune.ServerCacheManager
 import dev.openrune.definition.type.widget.IfEvent
-import dev.openrune.rscm.RSCM.asRSCM
-import dev.openrune.rscm.RSCMType
 import dev.openrune.types.aconverted.interf.IfButtonOp
 import jakarta.inject.Inject
 import org.rsmod.api.grandexchange.draft.OfferMath
@@ -13,15 +10,12 @@ import org.rsmod.api.grandexchange.engine.PlaceFailure
 import org.rsmod.api.grandexchange.engine.PlaceResult
 import org.rsmod.api.grandexchange.offer.OfferType
 import org.rsmod.api.grandexchange.offer.SlotCodec
-import org.rsmod.api.grandexchange.price.GePrices
 import org.rsmod.api.grandexchange.rules.GeItemCatalog
-import org.rsmod.api.player.output.StockMarket
 import org.rsmod.api.player.protect.ProtectedAccess
 import org.rsmod.api.player.ui.ifSetEvents
 import org.rsmod.api.script.onIfClose
 import org.rsmod.api.script.onIfModalButton
 import org.rsmod.api.script.onIfOpen
-import org.rsmod.api.utils.format.formatAmount
 import org.rsmod.game.entity.Player
 import org.rsmod.game.type.getInvObj
 import org.rsmod.plugin.scripts.PluginScript
@@ -40,9 +34,9 @@ constructor(
     private val exchange: GrandExchange,
     private val sessions: GeSessions,
     private val collector: GeCollector,
-    private val prices: GePrices,
     private val catalog: GeItemCatalog,
     private val windows: GeWindows,
+    private val setup: GeSetup,
 ) : PluginScript() {
     override fun ScriptContext.startup() {
         onIfOpen("interface.ge_offers") { player.enableOffersEvents() }
@@ -51,7 +45,7 @@ constructor(
         for (slot in 0 until SlotCodec.SLOTS) {
             onIfModalButton("component.ge_offers:index_$slot") { slotButton(slot, it.comsub, it.op) }
         }
-        onIfModalButton("component.ge_offers:back") { player.geSelectedSlot = 0 }
+        onIfModalButton("component.ge_offers:back") { setup.back(player) }
         onIfModalButton("component.ge_offers:history") { windows.openHistory(this) }
         onIfModalButton("component.ge_offers:collectall") { collectAllButton(it.comsub, it.op) }
         onIfModalButton("component.ge_offers:setup") { setupButton(it.comsub, it.op) }
@@ -97,14 +91,11 @@ constructor(
 
     private fun ProtectedAccess.viewSlot(slot: Int) {
         val session = sessions.of(player)
-        if (slot >= session.slotCount && session.slot(slot).isEmpty) {
+        val offer = session.slot(slot)
+        if (slot >= session.slotCount && offer.isEmpty) {
             return
         }
-        player.geSelectedSlot = slot + 1
-        val offer = session.slot(slot)
-        if (!offer.isEmpty) {
-            describe(offer.itemId, offer.type, setup = false)
-        }
+        setup.view(player, slot, if (offer.isEmpty) null else offer.itemId, offer.type)
     }
 
     private suspend fun ProtectedAccess.createOffer(slot: Int, type: OfferType) {
@@ -123,19 +114,14 @@ constructor(
     }
 
     private fun ProtectedAccess.beginSetup(slot: Int, type: OfferType) {
-        player.geSelectedSlot = slot + 1
-        player.geNewOfferType = type.code
-        player.geSearchItem = NO_ITEM
-        player.geNewOfferQuantity = 1
-        player.setOfferPrice(0)
-        ifSetText("component.ge_offers:setup_marketprice", "")
-        ifSetText("component.ge_offers:setup_desc", "")
+        setup.begin(player, slot, type)
     }
 
     private fun ProtectedAccess.abortSlot(slot: Int) {
         val session = sessions.of(player)
         if (exchange.abort(session, slot) == AbortResult.ABORTED) {
             mes("Abort request acknowledged. Please be aware that your offer may have already been completed.")
+            setup.refreshPanel(player)
         }
     }
 
@@ -168,6 +154,7 @@ constructor(
                 if (collector.collectAll(player, toBank)) {
                     mes("You don't have enough inventory space to collect everything.")
                 }
+                leaveFreedSlot()
             }
             1 -> if (op == IfButtonOp.Op1) repeatLastOffer()
         }
@@ -185,6 +172,14 @@ constructor(
         }
         beginSetup(free, OfferType.fromCode(player.geLastOfferType))
         selectItem(item, player.geLastOfferQuantity.coerceAtLeast(1), player.geLastOfferPrice.toLong())
+    }
+
+    /** A slot that has been collected empty has nothing left to show, so go back to the overview. */
+    private fun ProtectedAccess.leaveFreedSlot() {
+        val shown = player.geSelectedSlot - 1
+        if (shown in 0 until SlotCodec.SLOTS && sessions.of(player).slot(shown).isEmpty) {
+            setup.back(player)
+        }
     }
 
     private fun firstFreeSlot(session: GePlayer): Int? =
@@ -205,15 +200,8 @@ constructor(
         selectItem(info.id, quantity = 1, price = null)
     }
 
-    /** Fills the setup panel for [itemId]; a `null` price means the market price for the side. */
     private fun ProtectedAccess.selectItem(itemId: Int, quantity: Int, price: Long?) {
-        val type = OfferType.fromCode(player.geNewOfferType)
-        val info = catalog.resolve(itemId) ?: return
-        player.geSearchItem = info.id
-        player.geLastSearched = info.id
-        player.geNewOfferQuantity = quantity.coerceAtLeast(1)
-        player.setOfferPrice(price ?: marketPrice(info.id, type))
-        describe(info.id, type, setup = true)
+        setup.selectItem(player, itemId, quantity, price)
     }
 
     private suspend fun ProtectedAccess.setupButton(child: Int, op: IfButtonOp) {
@@ -251,7 +239,7 @@ constructor(
             CHILD_PRICE_PLUS_5 ->
                 if (op == IfButtonOp.Op1) changePrice(OfferMath.stepPricePercent(price(), 5, up = true))
             CHILD_PRICE_GUIDE ->
-                if (op == IfButtonOp.Op1) changePrice(marketPrice(selected, type))
+                if (op == IfButtonOp.Op1) changePrice(setup.marketPrice(selected, type))
             CHILD_PRICE_ENTER -> if (op == IfButtonOp.Op1) enterPrice()
             CHILD_PRICE_MINUS_X -> customPercent(op, up = false)
             CHILD_PRICE_PLUS_X -> customPercent(op, up = true)
@@ -261,7 +249,7 @@ constructor(
     private fun ProtectedAccess.price(): Long = player.geOfferPrice.toLong()
 
     private fun ProtectedAccess.changePrice(price: Long) {
-        player.setOfferPrice(price)
+        setup.setPrice(player, price)
     }
 
     private fun ProtectedAccess.stepQuantity(delta: Int) {
@@ -297,7 +285,7 @@ constructor(
     private suspend fun ProtectedAccess.enterPrice() {
         val entered = countDialog("Set a price for each item:")
         if (entered > 0 && player.geSearchItem > 0) {
-            player.setOfferPrice(entered.toLong())
+            setup.setPrice(player, entered.toLong())
         }
     }
 
@@ -306,7 +294,7 @@ constructor(
             IfButtonOp.Op1 -> {
                 val percent = player.gePriceCustom
                 if (percent > 0) {
-                    player.setOfferPrice(OfferMath.stepPricePercent(price(), percent, up))
+                    setup.setPrice(player, OfferMath.stepPricePercent(price(), percent, up))
                 }
             }
             IfButtonOp.Op2 -> {
@@ -369,7 +357,7 @@ constructor(
                 player.geLastOfferQuantity = quantity
                 player.geLastOfferPrice = price.toInt()
                 player.geLastOfferType = type.code
-                describe(item, type, setup = false)
+                setup.view(player, slot, item, type)
             }
             is PlaceResult.Rejected -> mes(rejection(result.reason, type))
         }
@@ -407,28 +395,7 @@ constructor(
             return
         }
         collector.collectDisplayed(this, slot, isItem = child == DETAILS_ITEM_CHILD, op = op)
-    }
-
-    private fun ProtectedAccess.describe(itemId: Int, type: OfferType, setup: Boolean) {
-        val item = ServerCacheManager.getItem(itemId) ?: return
-        val prefix = if (setup) "setup" else "details"
-        runClientScript(
-            DESC_SCRIPT,
-            item.examine,
-            "",
-            "component.ge_offers:${prefix}_desc".asRSCM(RSCMType.COMPONENT),
-            "component.ge_offers:${prefix}_fee".asRSCM(RSCMType.COMPONENT),
-        )
-        val guide = marketPrice(itemId, type)
-        ifSetText(
-            "component.ge_offers:${prefix}_marketprice",
-            "Guide price: ${guide.formatAmount} coins",
-        )
-    }
-
-    private fun marketPrice(itemId: Int, type: OfferType): Long {
-        val quote = prices.quote(itemId)
-        return if (type == OfferType.BUY) quote.buyAt else quote.sellAt
+        leaveFreedSlot()
     }
 
     /** What the player holds of an item for sale, counting noted copies. */
@@ -443,12 +410,6 @@ constructor(
 
     private fun ProtectedAccess.coinTotal(): Long =
         inv.totalOf(GeIds.coins) + inv.totalOf(GeIds.platinum) * GePlayer.TOKEN_VALUE
-
-    private fun Player.setOfferPrice(price: Long) {
-        val clamped = price.coerceIn(0L, OfferMath.MAX_PRICE)
-        geOfferPrice = clamped.toInt()
-        StockMarket.writeVarpLong(this, GeIds.CLIENT_OFFER_PRICE_VARP, clamped)
-    }
 
     private companion object {
         const val NO_ITEM = -1

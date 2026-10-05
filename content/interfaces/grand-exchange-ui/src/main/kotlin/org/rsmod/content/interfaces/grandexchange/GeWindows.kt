@@ -8,7 +8,6 @@ import org.rsmod.api.grandexchange.GrandExchangeSettings
 import org.rsmod.api.grandexchange.engine.GrandExchange
 import org.rsmod.api.player.ironman.IronmanActivity
 import org.rsmod.api.player.ironman.IronmanRestrictions
-import org.rsmod.api.player.output.StockMarket
 import org.rsmod.api.player.output.mes
 import org.rsmod.api.player.output.runClientScript
 import org.rsmod.api.player.protect.ProtectedAccess
@@ -22,6 +21,7 @@ constructor(
     private val exchange: GrandExchange,
     private val sessions: GeSessions,
     private val settings: GrandExchangeSettings,
+    private val setup: GeSetup,
 ) {
     /** Whether the player is turned away from the exchange; tells them why. */
     fun refuses(player: Player): Boolean {
@@ -42,25 +42,38 @@ constructor(
             return false
         }
         val player = access.player
-        val session = sessions.of(player)
-        player.geSelectedSlot = 0
-        player.geSearchItem = NO_ITEM
-        player.geNewOfferQuantity = 1
-        player.geTaxRate = exchange.taxRatePermille
-        if (player.geLastOfferItem == 0) {
-            player.geLastOfferItem = NO_ITEM
-        }
-        player.geOfferPrice = 0
-        StockMarket.writeVarpLong(player, GeIds.CLIENT_OFFER_PRICE_VARP, 0)
-        sessions.transmitBoxes(player)
+        prepare(player)
         access.invTransmit(access.inv)
-        session.pushAllSlots()
         access.ifOpenMainSidePair(
             main = "interface.ge_offers",
             side = "interface.ge_offers_side",
             transparency = -2,
         )
         return true
+    }
+
+    /**
+     * Puts every client var the window reads into a known state before it opens. Object vars that
+     * were never written are 0 on the server, which the client reads as item 0 rather than "none",
+     * so they are set to -1 explicitly, and the item sink vars are sent too.
+     */
+    fun prepare(player: Player) {
+        val session = sessions.of(player)
+        player.geSelectedSlot = 0
+        player.geSearchItem = NO_ITEM
+        player.geNewOfferQuantity = 1
+        player.geNewOfferType = 0
+        player.geTaxRate = exchange.taxRatePermille
+        if (player.geLastOfferItem == 0) {
+            player.geLastOfferItem = NO_ITEM
+        }
+        if (player.geLastSearched == 0) {
+            player.geLastSearched = NO_ITEM
+        }
+        setup.sendItemSinkDefaults(player)
+        setup.setPrice(player, 0)
+        sessions.transmitBoxes(player)
+        session.pushAllSlots()
     }
 
     fun openCollect(access: ProtectedAccess): Boolean {

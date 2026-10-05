@@ -9,7 +9,11 @@ import dev.openrune.types.varp.VarpLifetime
 import dev.openrune.types.varp.VarpTransmitLevel
 import dev.openrune.types.varp.bits
 import net.rsprot.protocol.game.outgoing.misc.player.MessageGame
+import net.rsprot.protocol.game.outgoing.misc.player.RunClientScript
 import net.rsprot.protocol.game.outgoing.misc.player.UpdateStockMarketSlotV2
+import net.rsprot.protocol.game.outgoing.varp.VarpLarge
+import net.rsprot.protocol.game.outgoing.varp.VarpLong
+import net.rsprot.protocol.game.outgoing.varp.VarpSmall
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -303,12 +307,12 @@ class GePlayerAdapterTest {
     @Test
     fun `every script registers its handlers against names that exist in the cache`() {
         val prices = GePrices(null, null, { null })
-        val windows = GeWindows(exchange, sessions, settings(enabled = true))
+        val windows = GeWindows(exchange, sessions, settings(enabled = true), GeSetup(GePrices(null, null, { null }), catalog))
         val collector = GeCollector(exchange, sessions, catalog)
         val scripts =
             listOf(
-                GeOffersScript(exchange, sessions, collector, prices, catalog, windows),
-                GeCollectScript(sessions, collector),
+                GeOffersScript(exchange, sessions, collector, catalog, windows, GeSetup(prices, catalog)),
+                GeCollectScript(sessions, collector, GeSetup(prices, catalog)),
                 GeHistoryScript(windows),
                 GeEntryScript(exchange, sessions, windows, prices),
             )
@@ -385,9 +389,106 @@ class GePlayerAdapterTest {
         }
     }
 
+    private val setupPrices = GePrices(null, null, { 3_000_000 })
+    private val setup = GeSetup(setupPrices, catalog)
+
+    private fun Player.script(id: Int) =
+        written.filterIsInstance<RunClientScript>().filter { it.id == id }
+
+    private fun component(name: String) = "component.ge_offers:$name".asRSCM(RSCMType.COMPONENT)
+
+    private val switchPanelArgs
+        get() =
+            listOf(
+                component("frame"),
+                1,
+                component("back"),
+                component("index"),
+                component("details"),
+                component("setup"),
+                component("tooltip"),
+            )
+
+    @Test
+    fun `starting an offer writes the slot and then runs the panel switch itself`() {
+        val p = player(30)
+        setup.begin(p, 0, OfferType.SELL)
+
+        val selected = p.written.indexOfFirst { it is VarpSmall && it.id == 375 && it.value == 1 shl 4 }
+        val typeAndQuantity =
+            p.written.indexOfFirst { it is VarpLarge && it.id == 563 && it.value == (1 shl 31) or 1 }
+        val switch = p.written.indexOfFirst { it is RunClientScript && it.id == 804 }
+        assertTrue(selected >= 0, "ge_selectedslot reaches the client")
+        assertTrue(typeAndQuantity >= 0, "sell type and quantity reach the client")
+        assertTrue(switch > selected && switch > typeAndQuantity, "the switch runs after the vars")
+        assertEquals(switchPanelArgs, (p.written[switch] as RunClientScript).values)
+    }
+
+    @Test
+    fun `choosing an item sends the price as a long and refreshes the panel`() {
+        val p = player(31)
+        setup.begin(p, 2, OfferType.BUY)
+        val whipId = catalog.resolve(whip)!!.id
+        setup.selectItem(p, whipId, 1, null)
+
+        assertEquals(whipId, p.geSearchItem)
+        assertEquals(3_000_000, p.geOfferPrice)
+        val price = p.written.filterIsInstance<VarpLong>().last { it.id == 5753 }
+        assertEquals(3_000_000L, price.value)
+        assertTrue(p.written.indexOf(price) < p.written.indexOfLast { it is RunClientScript && it.id == 804 })
+        assertEquals(3, p.geSelectedSlot)
+        assertTrue(p.script(5730).isNotEmpty(), "the item description is set")
+    }
+
+    @Test
+    fun `an empty slot is sent as an empty offer for that slot, never as a reset`() {
+        val p = player(34)
+        val session = GePlayer(p, catalog)
+        session.pushSlot(3)
+        val update = p.written.filterIsInstance<UpdateStockMarketSlotV2>().single()
+        assertEquals(3, update.slot)
+        assertTrue(update.update is UpdateStockMarketSlotV2.SetStockMarketSlot)
+        assertEquals(0, (update.update as UpdateStockMarketSlotV2.SetStockMarketSlot).status)
+    }
+
+    @Test
+    fun `viewing a slot and going back both refresh the panel`() {
+        val p = player(32)
+        setup.view(p, 4, whip, OfferType.BUY)
+        assertEquals(5, p.geSelectedSlot)
+        assertEquals(switchPanelArgs, p.script(804).last().values)
+        setup.back(p)
+        assertEquals(0, p.geSelectedSlot)
+        assertEquals(2, p.script(804).size)
+    }
+
+    @Test
+    fun `opening the window resets every var it reads, including the item sink slots`() {
+        val windows = GeWindows(exchange, sessions, settings(enabled = true), setup)
+        val p = player(33)
+        p.geLastOfferItem = 0
+        windows.prepare(p)
+
+        assertEquals(-1, p.geSearchItem)
+        assertEquals(-1, p.geLastOfferItem)
+        assertEquals(1, p.geNewOfferQuantity)
+        assertEquals(exchange.taxRatePermille, p.geTaxRate)
+        for (slot in 0 until 8) {
+            val varp = "varp.ge_itemsink_obj_$slot".asRSCM(RSCMType.VARP)
+            assertEquals(-1, p.vars.backing[varp])
+            assertTrue(p.written.any { (it is VarpSmall && it.id == varp && it.value == -1) })
+        }
+        for (slot in 0 until 8) {
+            val sink = GeIds.itemSinkPriceVarps[slot].id
+            assertTrue(p.written.filterIsInstance<VarpLong>().any { it.id == sink && it.value == 0L })
+        }
+        assertEquals(8, p.written.filterIsInstance<UpdateStockMarketSlotV2>().size)
+        assertTrue(p.written.filterIsInstance<VarpLong>().any { it.id == 5753 && it.value == 0L })
+    }
+
     @Test
     fun `ironmen are turned away and everyone else gets in`() {
-        val windows = GeWindows(exchange, sessions, settings(enabled = true))
+        val windows = GeWindows(exchange, sessions, settings(enabled = true), GeSetup(GePrices(null, null, { null }), catalog))
         val normal = player(20)
         assertFalse(windows.refuses(normal))
         assertTrue(normal.written.filterIsInstance<MessageGame>().isEmpty())
@@ -398,7 +499,7 @@ class GePlayerAdapterTest {
         val message = ironman.written.filterIsInstance<MessageGame>().single()
         assertEquals("As an Ironman, you cannot use the Grand Exchange.", message.message)
 
-        val closed = GeWindows(exchange, sessions, settings(enabled = false))
+        val closed = GeWindows(exchange, sessions, settings(enabled = false), GeSetup(GePrices(null, null, { null }), catalog))
         assertTrue(closed.refuses(player(22)))
         assertNotEquals(0, SlotCodec.WORDS)
     }

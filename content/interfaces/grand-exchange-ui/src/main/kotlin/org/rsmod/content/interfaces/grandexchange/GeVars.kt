@@ -57,6 +57,11 @@ internal object GeIds {
         Array(SlotCodec.SLOTS) { varp("varp.ge_tax_slot_long_$it") }
     }
 
+    /** The long item sink price varps; the offers scripts read them when they look at a slot. */
+    val itemSinkPriceVarps: Array<VarpServerType> by lazy {
+        Array(SlotCodec.SLOTS) { varp("varp.ge_itemsink_price_long_$it") }
+    }
+
     /** `varplayer_5753`, the long varp the setup screen reads the price from. */
     const val CLIENT_OFFER_PRICE_VARP: Int = 5753
 

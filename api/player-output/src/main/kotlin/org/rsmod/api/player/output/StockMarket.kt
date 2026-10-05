@@ -1,7 +1,6 @@
 package org.rsmod.api.player.output
 
 import net.rsprot.protocol.game.outgoing.misc.player.UpdateStockMarketSlotV2
-import net.rsprot.protocol.game.outgoing.misc.player.UpdateStockMarketSlotV2.ResetStockMarketSlot
 import net.rsprot.protocol.game.outgoing.misc.player.UpdateStockMarketSlotV2.SetStockMarketSlot
 import net.rsprot.protocol.game.outgoing.varp.VarpLong
 import org.rsmod.game.entity.Player
@@ -39,8 +38,14 @@ public object StockMarket {
         player.client.write(UpdateStockMarketSlotV2(slot, update))
     }
 
+    /**
+     * Empties [slot] on the client.
+     *
+     * This sends an offer in state 0 rather than a `ResetStockMarketSlot`: rsprot's V2 encoder writes
+     * the reset with a hard-coded slot of 0, so resetting any other slot would instead wipe slot 0.
+     */
     public fun resetSlot(player: Player, slot: Int) {
-        player.client.write(UpdateStockMarketSlotV2(slot, ResetStockMarketSlot))
+        setSlot(player, slot, status = 0, obj = 0, price = 0, count = 0, completedCount = 0, completedGold = 0)
     }
 
     /**

@@ -15,8 +15,11 @@ import org.rsmod.plugin.scripts.ScriptContext
 /** The standalone collection box (`ge_collect`), reached from bankers, clerks and booths. */
 internal class GeCollectScript
 @Inject
-constructor(private val sessions: GeSessions, private val collector: GeCollector) :
-    PluginScript() {
+constructor(
+    private val sessions: GeSessions,
+    private val collector: GeCollector,
+    private val setup: GeSetup,
+) : PluginScript() {
     override fun ScriptContext.startup() {
         onIfOpen("interface.ge_collect") { player.prepareCollect() }
         for (slot in 0 until SlotCodec.SLOTS) {
@@ -28,6 +31,7 @@ constructor(private val sessions: GeSessions, private val collector: GeCollector
 
     private fun Player.prepareCollect() {
         sessions.transmitBoxes(this)
+        setup.sendItemSinkDefaults(this)
         sessions.of(this).pushAllSlots()
         for (slot in 0 until SlotCodec.SLOTS) {
             ifSetEvents(
