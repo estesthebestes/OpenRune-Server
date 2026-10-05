@@ -22,12 +22,19 @@ internal class CompiledClassIndex(private val root: Path) {
             if (!base.isDirectory()) return@flatMap emptyList()
             Files.walk(base).use { stream ->
                 stream
-                    .filter { it.isDirectory() && it.name == "build" }
+                    .filter { it.isDirectory() && it.name == "build" && !isExternalPlugin(it.parent) }
                     .map { it.resolve("classes").resolve("kotlin").resolve("main") }
                     .filter { it.isDirectory() }
                     .toList()
             }
         }
+
+    /**
+     * Modules with a `plugin.properties` are external plugins (e.g. the test-bot modules): their
+     * classes live in the plugin loader's own classloader and reload through it, not `::hotswap`.
+     */
+    private fun isExternalPlugin(module: Path): Boolean =
+        module.resolve("src").resolve("main").resolve("resources").resolve("plugin.properties").isRegularFile()
 
     /** Fingerprints every class file, re-reading only files whose size or timestamp changed. */
     fun snapshot(previous: Map<String, ClassFileStamp>?): Map<String, ClassFileStamp> {
