@@ -50,8 +50,8 @@ sets the price that fills immediately for the side being set up (`high` for buys
 - **Instant fills only.** `gameplay.grand-exchange.fill-model` accepts `instant`. A volume-paced
   `gradual` model implements `FillModel` (`marketFill` + `shouldSweep`) and is added to `FillModels`;
   nothing else changes.
-- Ironmen are refused (`IronmanRestrictions.block(player, IronmanActivity.GRAND_EXCHANGE)`). Item
-  sets (the clerk's "Sets" option) are not implemented. Prices are capped at 2,147,483,647 per item.
+- Ironmen are refused (`IronmanRestrictions.block(player, IronmanActivity.GRAND_EXCHANGE)`).
+  Prices are capped at 2,147,483,647 per item.
 - The history keeps the last 10 finished trades.
 
 ## Prices
@@ -150,8 +150,8 @@ The op protocol (comsub = the child index the clientscripts create with `cc_crea
 The server enables those ranges with `IfSetEvents`; without that the engine drops the ops. The
 history window is filled with `ge_history_init` / `ge_history_addline` / `ge_history_finish`.
 
-Entry points: `npc.ge_clerk_1..4` op1 (talk), op3 (Exchange), op4 (History), op5 (Sets: not
-available); `loc.exchange_bank_wall_exchange` op1 (Exchange); op3 (Collect) on the three Grand
+Entry points: `npc.ge_clerk_1..4` op1 (talk), op3 (Exchange), op4 (History), op5 (Sets: the `itemsets`
+window, see `GeItemSets`); `loc.exchange_bank_wall_exchange` op1 (Exchange); op3 (Collect) on the three Grand
 Exchange booth locs. Bankers' "Collect" already opens `ge_collect` and works with the same script.
 
 ## Verifying in a client

@@ -16288,3 +16288,88 @@ defaultMode = "None"
 id = "npc.leviathan_tail_ring_3"
 inherit = "npc.leviathan_tail_ring_3"
 defaultMode = "None"
+
+# Grand Exchange: bankers are generic bankers, everyone stands at their post.
+
+[[npc]]
+id = "npc.banker1_east"
+inherit = "npc.banker1_east"
+contentGroup = "content.banker"
+wanderRange = 0
+
+[[npc]]
+id = "npc.banker1_west"
+inherit = "npc.banker1_west"
+contentGroup = "content.banker"
+wanderRange = 0
+
+[[npc]]
+id = "npc.banker2_east"
+inherit = "npc.banker2_east"
+contentGroup = "content.banker"
+wanderRange = 0
+
+[[npc]]
+id = "npc.deadman_banker_grey_west"
+inherit = "npc.deadman_banker_grey_west"
+wanderRange = 0
+
+[[npc]]
+id = "npc.ge_clerk_1"
+inherit = "npc.ge_clerk_1"
+wanderRange = 0
+
+[[npc]]
+id = "npc.ge_clerk_2"
+inherit = "npc.ge_clerk_2"
+wanderRange = 0
+
+[[npc]]
+id = "npc.ge_clerk_3"
+inherit = "npc.ge_clerk_3"
+wanderRange = 0
+
+[[npc]]
+id = "npc.ge_clerk_4"
+inherit = "npc.ge_clerk_4"
+wanderRange = 0
+
+[[npc]]
+id = "npc.ge_boss"
+inherit = "npc.ge_boss"
+wanderRange = 0
+
+[[npc]]
+id = "npc.bond_james_bond"
+inherit = "npc.bond_james_bond"
+wanderRange = 0
+
+[[npc]]
+id = "npc.ge_expert_ores"
+inherit = "npc.ge_expert_ores"
+wanderRange = 0
+timer = 300
+
+[[npc]]
+id = "npc.ge_expert_logs"
+inherit = "npc.ge_expert_logs"
+wanderRange = 0
+timer = 300
+
+[[npc]]
+id = "npc.ge_expert_herbs"
+inherit = "npc.ge_expert_herbs"
+wanderRange = 0
+timer = 300
+
+[[npc]]
+id = "npc.ge_expert_runes"
+inherit = "npc.ge_expert_runes"
+wanderRange = 0
+timer = 300
+
+[[npc]]
+id = "npc.ge_expert_combat"
+inherit = "npc.ge_expert_combat"
+wanderRange = 0
+timer = 300

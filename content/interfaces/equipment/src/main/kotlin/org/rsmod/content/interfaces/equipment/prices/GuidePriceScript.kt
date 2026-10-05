@@ -47,6 +47,11 @@ constructor(
         onIfClose("interface.ge_pricechecker") { player.closeGuide() }
     }
 
+    fun open(access: ProtectedAccess) {
+        access.ifClose()
+        access.openGuide()
+    }
+
     private fun Player.selectGuidePrices() {
         ifClose(eventBus)
         protectedAccess.launch(this) { openGuide() }

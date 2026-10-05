@@ -4,7 +4,6 @@ import jakarta.inject.Inject
 import org.rsmod.api.game.process.GameLifecycle
 import org.rsmod.api.grandexchange.engine.GrandExchange
 import org.rsmod.api.grandexchange.price.GePrices
-import org.rsmod.api.player.dialogue.Dialogue
 import org.rsmod.api.player.protect.ProtectedAccess
 import org.rsmod.api.script.onApNpc3
 import org.rsmod.api.script.onApNpc4
@@ -34,21 +33,26 @@ constructor(
     private val windows: GeWindows,
     private val prices: GePrices,
 ) : PluginScript() {
+    private val itemSets = GeItemSets()
+    private val clerks = GeClerkDialogue(windows, itemSets, sessions)
     private var tick = 0L
     private var pricesSeen = -1L
 
     override fun ScriptContext.startup() {
-        onPlayerLogin { sessions.login(player) }
+        onPlayerLogin {
+            sessions.login(player)
+            clerks.remind(player)
+        }
         onPlayerLogout { sessions.logout(player) }
         onEvent<GameLifecycle.LateCycle> { sweep() }
 
         for (clerk in CLERKS) {
-            onOpNpc1(clerk) { startDialogue(it.npc) { greeting() } }
+            onOpNpc1(clerk) { startDialogue(it.npc) { clerks.greet(this) } }
             onApNpc3(clerk) { approach(it.npc) { windows.openExchange(this) } }
             onOpNpc3(clerk) { windows.openExchange(this) }
             onApNpc4(clerk) { approach(it.npc) { windows.openHistory(this) } }
             onOpNpc4(clerk) { windows.openHistory(this) }
-            onOpNpc5(clerk) { itemSets() }
+            onOpNpc5(clerk) { itemSets.open(this) }
         }
 
         onOpLoc1(BOOTH_EXCHANGE) { windows.openExchange(this) }
@@ -69,45 +73,6 @@ constructor(
         if (isWithinApRange(npc, distance = 2)) {
             action()
         }
-    }
-
-    private fun ProtectedAccess.itemSets() {
-        mes("Item sets are not available on this server yet.")
-    }
-
-    private suspend fun Dialogue.greeting() {
-        chatNpc(neutral, "Welcome to the Grand Exchange. How can I help you?")
-        val option =
-            choice4(
-                "I'd like to set up trade offers please.",
-                1,
-                "How do I use the Grand Exchange?",
-                2,
-                "I'd like to collect my items.",
-                3,
-                "Actually, nothing now.",
-                4,
-            )
-        when (option) {
-            1 -> windows.openExchange(access)
-            2 -> howItWorks()
-            3 -> windows.openCollect(access)
-            4 -> chatPlayer(neutral, "Actually, nothing now.")
-        }
-    }
-
-    private suspend fun Dialogue.howItWorks() {
-        chatPlayer(quiz, "How do I use the Grand Exchange?")
-        chatNpc(
-            neutral,
-            "Set up a buy or sell offer in one of your slots. Offers at the market price trade " +
-                "straight away, and other players' offers are matched first.",
-        )
-        chatNpc(
-            neutral,
-            "Whatever you buy or get back waits in the offer's collection box until you " +
-                "collect it. Selling is charged a small fee.",
-        )
     }
 
     private companion object {

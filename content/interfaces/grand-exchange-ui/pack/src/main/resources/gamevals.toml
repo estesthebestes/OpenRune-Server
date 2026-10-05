@@ -1,0 +1,9 @@
+[gamevals.varp]
+ge_collect_reminders = 64160
+
+[gamevals.varbit]
+ge_collect_reminders = 64160
+
+[gamevals.enum]
+ge_item_sets = 1033
+ge_item_sets_by_obj = 1034

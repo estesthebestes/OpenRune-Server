@@ -1,0 +1,6 @@
+[[inventory]]
+id = "inv.ge_pricelist"
+size = 100
+scope = "Temp"
+stack = "Always"
+protect = false

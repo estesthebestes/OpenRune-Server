@@ -1,0 +1,10 @@
+[[varp]]
+id = "varp.ge_collect_reminders"
+scope = "Perm"
+transmit = "Never"
+
+[[varbit]]
+id = "varbit.ge_collect_reminders"
+varp = "varp.ge_collect_reminders"
+startBit = 0
+endBit = 0
