@@ -74,7 +74,7 @@ constructor(
         val type = ServerCacheManager.getObject(locId(loc) ?: return) ?: return
         val slot = (1..5).firstOrNull { !type.actions.getOpOrNull(it - 1).isNullOrBlank() } ?: return
         // Obstacles operated across a wall edge can never be "reached", so they trigger on approach.
-        val approachRange = mapOf("loc.rooftops_kharid_bamboo_tree_top" to 1)[loc]
+        val approachRange = APPROACH_RANGES[loc]
         if (approachRange == null) {
             when (slot) {
                 1 -> onOpLoc1(loc) { action(it.loc) }

@@ -206,3 +206,10 @@ object AgilityCourses {
         AgilityCourseRow.all().map { row -> row.toCourse(obstacles[row.rowId].orEmpty()) }
     }
 }
+
+/**
+ * Obstacles that can never be walked up to: the tiles beside them are blocked in the map, so the
+ * loc is operated from a short distance away and fires on approach instead.
+ */
+internal val APPROACH_RANGES: Map<String, Int> =
+    mapOf("loc.rooftops_kharid_bamboo_tree_top" to 1, "loc.rooftops_varrock_wallswing" to 2)
