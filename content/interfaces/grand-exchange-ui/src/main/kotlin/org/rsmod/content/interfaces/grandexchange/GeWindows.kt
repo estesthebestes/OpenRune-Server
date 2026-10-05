@@ -1,5 +1,6 @@
 package org.rsmod.content.interfaces.grandexchange
 
+import com.github.michaelbull.logging.InlineLogger
 import dev.openrune.rscm.RSCM.asRSCM
 import dev.openrune.rscm.RSCMType
 import jakarta.inject.Inject
@@ -35,6 +36,8 @@ constructor(
         return false
     }
 
+    private val logger = InlineLogger()
+
     private fun allowed(access: ProtectedAccess): Boolean = !refuses(access.player)
 
     fun openExchange(access: ProtectedAccess): Boolean {
@@ -42,6 +45,7 @@ constructor(
             return false
         }
         val player = access.player
+        logger.debug { "GE opening exchange: player=${player.username}" }
         prepare(player)
         access.invTransmit(access.inv)
         access.ifOpenMainSidePair(

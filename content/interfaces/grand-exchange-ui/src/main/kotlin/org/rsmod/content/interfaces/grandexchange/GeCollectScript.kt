@@ -1,5 +1,6 @@
 package org.rsmod.content.interfaces.grandexchange
 
+import com.github.michaelbull.logging.InlineLogger
 import dev.openrune.definition.type.widget.IfEvent
 import dev.openrune.types.aconverted.interf.IfButtonOp
 import jakarta.inject.Inject
@@ -20,10 +21,18 @@ constructor(
     private val collector: GeCollector,
     private val setup: GeSetup,
 ) : PluginScript() {
+    private val logger = InlineLogger()
+
     override fun ScriptContext.startup() {
-        onIfOpen("interface.ge_collect") { player.prepareCollect() }
+        onIfOpen("interface.ge_collect") {
+            logger.debug { "GE collection box opened: player=${player.username}" }
+            player.prepareCollect()
+        }
         for (slot in 0 until SlotCodec.SLOTS) {
-            onIfModalButton("component.ge_collect:collect_$slot") { collectSlot(slot, it.comsub, it.op) }
+            onIfModalButton("component.ge_collect:collect_$slot") {
+                logger.debug { "GE collect button: slot=$slot comsub=${it.comsub} op=${it.op}" }
+                collectSlot(slot, it.comsub, it.op)
+            }
         }
         onIfModalButton("component.ge_collect:collect_inv") { collectAll(toBank = false) }
         onIfModalButton("component.ge_collect:collect_bank") { collectAll(toBank = true) }

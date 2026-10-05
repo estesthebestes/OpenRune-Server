@@ -8,6 +8,7 @@ import dev.openrune.types.InvStackType
 import dev.openrune.types.varp.VarpLifetime
 import dev.openrune.types.varp.VarpTransmitLevel
 import dev.openrune.types.varp.bits
+import net.rsprot.protocol.game.outgoing.interfaces.IfSetHide
 import net.rsprot.protocol.game.outgoing.misc.player.MessageGame
 import net.rsprot.protocol.game.outgoing.misc.player.RunClientScript
 import net.rsprot.protocol.game.outgoing.misc.player.UpdateStockMarketSlotV2
@@ -307,12 +308,12 @@ class GePlayerAdapterTest {
     @Test
     fun `every script registers its handlers against names that exist in the cache`() {
         val prices = GePrices(null, null, { null })
-        val windows = GeWindows(exchange, sessions, settings(enabled = true), GeSetup(GePrices(null, null, { null }), catalog))
+        val windows = GeWindows(exchange, sessions, settings(enabled = true), GeSetup(GePrices(null, null, { null }), catalog, sessions))
         val collector = GeCollector(exchange, sessions, catalog)
         val scripts =
             listOf(
-                GeOffersScript(exchange, sessions, collector, catalog, windows, GeSetup(prices, catalog)),
-                GeCollectScript(sessions, collector, GeSetup(prices, catalog)),
+                GeOffersScript(exchange, sessions, collector, catalog, windows, GeSetup(prices, catalog, sessions)),
+                GeCollectScript(sessions, collector, GeSetup(prices, catalog, sessions)),
                 GeHistoryScript(windows),
                 GeEntryScript(exchange, sessions, windows, prices),
             )
@@ -390,7 +391,7 @@ class GePlayerAdapterTest {
     }
 
     private val setupPrices = GePrices(null, null, { 3_000_000 })
-    private val setup = GeSetup(setupPrices, catalog)
+    private val setup = GeSetup(setupPrices, catalog, sessions)
 
     private fun Player.script(id: Int) =
         written.filterIsInstance<RunClientScript>().filter { it.id == id }
@@ -422,6 +423,42 @@ class GePlayerAdapterTest {
         assertTrue(typeAndQuantity >= 0, "sell type and quantity reach the client")
         assertTrue(switch > selected && switch > typeAndQuantity, "the switch runs after the vars")
         assertEquals(switchPanelArgs, (p.written[switch] as RunClientScript).values)
+    }
+
+    private fun Player.hides(): Map<String, Boolean> =
+        written.filterIsInstance<IfSetHide>().associate { it.combinedId to it.hidden }.let { byId ->
+            listOf("back", "index", "details", "setup").associateWith { name ->
+                byId.getValue(component(name))
+            }
+        }
+
+    @Test
+    fun `the panels are shown and hidden by the server itself, whatever the client scripts do`() {
+        val p = player(40)
+        setup.back(p)
+        assertEquals(mapOf("back" to true, "index" to false, "details" to true, "setup" to true), p.hides())
+
+        setup.begin(p, 0, OfferType.BUY)
+        assertEquals(mapOf("back" to false, "index" to true, "details" to true, "setup" to false), p.hides())
+
+        val session = GePlayer(p, catalog)
+        session.setSlot(0, OfferSlot(OfferState.OPEN, OfferType.BUY, whip, 1, 1_000, 0, 0, 0))
+        setup.view(p, 0, whip, OfferType.BUY)
+        assertEquals(mapOf("back" to false, "index" to true, "details" to false, "setup" to true), p.hides())
+    }
+
+    @Test
+    fun `the setup and status panels are rebuilt from the current vars before the switch`() {
+        val p = player(41)
+        setup.begin(p, 1, OfferType.SELL)
+        val reinit = p.written.indexOfFirst { it is RunClientScript && it.id == 5306 }
+        val switch = p.written.indexOfFirst { it is RunClientScript && it.id == 804 }
+        assertTrue(reinit in 0 until switch)
+        assertEquals(
+            listOf("setup", "setup_marketprice", "setup_confirm", "details", "details_marketprice", "details_status")
+                .map { component(it) },
+            (p.written[reinit] as RunClientScript).values,
+        )
     }
 
     @Test
@@ -488,7 +525,7 @@ class GePlayerAdapterTest {
 
     @Test
     fun `ironmen are turned away and everyone else gets in`() {
-        val windows = GeWindows(exchange, sessions, settings(enabled = true), GeSetup(GePrices(null, null, { null }), catalog))
+        val windows = GeWindows(exchange, sessions, settings(enabled = true), GeSetup(GePrices(null, null, { null }), catalog, sessions))
         val normal = player(20)
         assertFalse(windows.refuses(normal))
         assertTrue(normal.written.filterIsInstance<MessageGame>().isEmpty())
@@ -499,7 +536,7 @@ class GePlayerAdapterTest {
         val message = ironman.written.filterIsInstance<MessageGame>().single()
         assertEquals("As an Ironman, you cannot use the Grand Exchange.", message.message)
 
-        val closed = GeWindows(exchange, sessions, settings(enabled = false), GeSetup(GePrices(null, null, { null }), catalog))
+        val closed = GeWindows(exchange, sessions, settings(enabled = false), GeSetup(GePrices(null, null, { null }), catalog, sessions))
         assertTrue(closed.refuses(player(22)))
         assertNotEquals(0, SlotCodec.WORDS)
     }

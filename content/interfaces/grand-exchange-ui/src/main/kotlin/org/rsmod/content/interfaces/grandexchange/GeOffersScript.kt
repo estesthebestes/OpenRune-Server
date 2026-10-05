@@ -1,5 +1,6 @@
 package org.rsmod.content.interfaces.grandexchange
 
+import com.github.michaelbull.logging.InlineLogger
 import dev.openrune.definition.type.widget.IfEvent
 import dev.openrune.types.aconverted.interf.IfButtonOp
 import jakarta.inject.Inject
@@ -38,23 +39,64 @@ constructor(
     private val windows: GeWindows,
     private val setup: GeSetup,
 ) : PluginScript() {
+    private val logger = InlineLogger()
+
     override fun ScriptContext.startup() {
-        onIfOpen("interface.ge_offers") { player.enableOffersEvents() }
-        onIfClose("interface.ge_offers") { player.geSelectedSlot = 0 }
+        onIfOpen("interface.ge_offers") {
+            logger.debug { "GE offers window opened: player=${player.username}" }
+            player.enableOffersEvents()
+        }
+        onIfClose("interface.ge_offers") {
+            logger.debug { "GE offers window closed: player=${player.username}" }
+            player.geSelectedSlot = 0
+        }
 
         for (slot in 0 until SlotCodec.SLOTS) {
-            onIfModalButton("component.ge_offers:index_$slot") { slotButton(slot, it.comsub, it.op) }
+            onIfModalButton("component.ge_offers:index_$slot") {
+                logOp("index_$slot", it.comsub, it.op)
+                slotButton(slot, it.comsub, it.op)
+            }
         }
-        onIfModalButton("component.ge_offers:back") { setup.back(player) }
-        onIfModalButton("component.ge_offers:history") { windows.openHistory(this) }
-        onIfModalButton("component.ge_offers:collectall") { collectAllButton(it.comsub, it.op) }
-        onIfModalButton("component.ge_offers:setup") { setupButton(it.comsub, it.op) }
-        onIfModalButton("component.ge_offers:setup_confirm") { confirmOffer() }
-        onIfModalButton("component.ge_offers:details_status") { statusButton(it.comsub) }
+        onIfModalButton("component.ge_offers:back") {
+            logOp("back", it.comsub, it.op)
+            setup.back(player)
+        }
+        onIfModalButton("component.ge_offers:history") {
+            logOp("history", it.comsub, it.op)
+            windows.openHistory(this)
+        }
+        onIfModalButton("component.ge_offers:collectall") {
+            logOp("collectall", it.comsub, it.op)
+            collectAllButton(it.comsub, it.op)
+        }
+        onIfModalButton("component.ge_offers:setup") {
+            logOp("setup", it.comsub, it.op)
+            setupButton(it.comsub, it.op)
+        }
+        onIfModalButton("component.ge_offers:setup_confirm") {
+            logOp("setup_confirm", it.comsub, it.op)
+            confirmOffer()
+        }
+        onIfModalButton("component.ge_offers:details_status") {
+            logOp("details_status", it.comsub, it.op)
+            statusButton(it.comsub)
+        }
         onIfModalButton("component.ge_offers:details_collect") {
+            logOp("details_collect", it.comsub, it.op)
             detailsCollectButton(it.comsub, it.op)
         }
-        onIfModalButton("component.ge_offers_side:items") { sideItemButton(it.comsub, it.op) }
+        onIfModalButton("component.ge_offers_side:items") {
+            logOp("side:items", it.comsub, it.op)
+            sideItemButton(it.comsub, it.op)
+        }
+    }
+
+    private fun ProtectedAccess.logOp(component: String, comsub: Int, op: IfButtonOp) {
+        logger.debug {
+            "GE button: player=${player.username} component=$component comsub=$comsub op=$op " +
+                "selectedSlot=${player.geSelectedSlot} type=${player.geNewOfferType} " +
+                "item=${player.geSearchItem} qty=${player.geNewOfferQuantity} price=${player.geOfferPrice}"
+        }
     }
 
     private fun Player.enableOffersEvents() {
@@ -101,12 +143,15 @@ constructor(
     private suspend fun ProtectedAccess.createOffer(slot: Int, type: OfferType) {
         val session = sessions.of(player)
         if (slot >= session.slotCount) {
+            logger.debug { "GE create offer refused: slot $slot is beyond ${session.slotCount} slots" }
             mes("You need to be a member to use that offer slot.")
             return
         }
         if (!session.slot(slot).isEmpty || !session.box(slot).isEmpty()) {
+            logger.debug { "GE create offer ignored: slot $slot is in use (${session.slot(slot).state})" }
             return
         }
+        logger.debug { "GE create $type offer in slot $slot" }
         beginSetup(slot, type)
         if (type == OfferType.BUY) {
             chooseBuyItem()

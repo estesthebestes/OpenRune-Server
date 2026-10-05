@@ -1,5 +1,6 @@
 package org.rsmod.content.interfaces.grandexchange
 
+import com.github.michaelbull.logging.InlineLogger
 import dev.openrune.ServerCacheManager
 import dev.openrune.rscm.RSCM.asRSCM
 import dev.openrune.rscm.RSCMType
@@ -12,6 +13,7 @@ import org.rsmod.api.grandexchange.price.GePrices
 import org.rsmod.api.grandexchange.rules.GeItemCatalog
 import org.rsmod.api.player.output.StockMarket
 import org.rsmod.api.player.output.runClientScript
+import org.rsmod.api.player.ui.ifSetHide
 import org.rsmod.api.player.ui.ifSetText
 import org.rsmod.api.player.vars.VarPlayerIntMapSetter
 import org.rsmod.api.utils.format.formatAmount
@@ -27,7 +29,15 @@ import org.rsmod.game.entity.Player
  * script itself with the components the interface was loaded with.
  */
 @Singleton
-internal class GeSetup @Inject constructor(private val prices: GePrices, private val catalog: GeItemCatalog) {
+internal class GeSetup
+@Inject
+constructor(
+    private val prices: GePrices,
+    private val catalog: GeItemCatalog,
+    private val sessions: GeSessions,
+) {
+    private val logger = InlineLogger()
+
     /** Opens the setup panel for an empty [slot]. */
     fun begin(player: Player, slot: Int, type: OfferType) {
         player.geSelectedSlot = slot + 1
@@ -107,8 +117,29 @@ internal class GeSetup @Inject constructor(private val prices: GePrices, private
         }
     }
 
-    /** Runs `ge_offers_switchpanel` so the window shows the overview, setup or status panel. */
+    /**
+     * Brings the window in line with the server's state, without depending on the client's own
+     * var-transmit hooks (which have not been seen firing for this interface):
+     * 1. `ge_offers_reinit` rebuilds and redraws the setup and status panels from the current vars;
+     * 2. `ge_offers_switchpanel` picks the panel and title;
+     * 3. the panels are shown or hidden directly, so the right one is visible even if the scripts
+     *    fail for any reason.
+     */
     fun refreshPanel(player: Player) {
+        val selected = player.geSelectedSlot
+        val panel = panelFor(player, selected)
+        logger.debug {
+            "GE panel refresh: player=${player.username} selectedSlot=$selected panel=$panel"
+        }
+        player.runClientScript(
+            REINIT_SCRIPT,
+            component("setup"),
+            component("setup_marketprice"),
+            component("setup_confirm"),
+            component("details"),
+            component("details_marketprice"),
+            component("details_status"),
+        )
         player.runClientScript(
             SWITCH_PANEL_SCRIPT,
             component("frame"),
@@ -119,7 +150,25 @@ internal class GeSetup @Inject constructor(private val prices: GePrices, private
             component("setup"),
             component("tooltip"),
         )
+        player.ifSetHide("component.ge_offers:back", panel == Panel.OVERVIEW)
+        player.ifSetHide("component.ge_offers:index", panel != Panel.OVERVIEW)
+        player.ifSetHide("component.ge_offers:details", panel != Panel.STATUS)
+        player.ifSetHide("component.ge_offers:setup", panel != Panel.SETUP)
     }
+
+    enum class Panel {
+        OVERVIEW,
+        SETUP,
+        STATUS,
+    }
+
+    /** The panel `ge_offers_switchpanel` would pick for [selected] (0 = overview, else slot + 1). */
+    fun panelFor(player: Player, selected: Int): Panel =
+        when {
+            selected !in 1..SlotCodec.SLOTS -> Panel.OVERVIEW
+            sessions.of(player).slot(selected - 1).isEmpty -> Panel.SETUP
+            else -> Panel.STATUS
+        }
 
     private fun component(name: String): Int =
         "component.ge_offers:$name".asRSCM(RSCMType.COMPONENT)
@@ -128,6 +177,7 @@ internal class GeSetup @Inject constructor(private val prices: GePrices, private
         const val NO_ITEM = -1
         const val DESC_SCRIPT = 5730
         const val SWITCH_PANEL_SCRIPT = 804
+        const val REINIT_SCRIPT = 5306
 
         /** The child `steelborder` creates its title text as, which the script rewrites. */
         const val TITLE_CHILD = 1
