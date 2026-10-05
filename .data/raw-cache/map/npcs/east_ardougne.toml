@@ -752,6 +752,12 @@ coords = "0_41_51_0_63"
 npc = "npc.guarddog"
 coords = "0_41_51_22_61"
 
+## Wizard Cromperty House
+
+[[spawn]]
+npc = "npc.cromperty_pre_diary"
+coords = "0_41_51_61_60"
+
 ## Mahogany Homes
 
 [[spawn]]
