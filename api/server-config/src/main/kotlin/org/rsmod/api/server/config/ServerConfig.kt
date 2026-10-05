@@ -38,6 +38,30 @@ public data class GameplayConfig(
     val questRequirements: QuestRequirementsYaml = QuestRequirementsYaml(),
     @JsonProperty("drop-rates")
     val dropRates: DropRatesYaml = DropRatesYaml(),
+    @JsonProperty("grand-exchange") val grandExchange: GrandExchangeYaml = GrandExchangeYaml(),
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public data class GrandExchangeYaml(
+    val enabled: Boolean = true,
+    @JsonProperty("fill-model") val fillModel: String = "instant",
+    val prices: GrandExchangePricesYaml = GrandExchangePricesYaml(),
+    val tax: GrandExchangeTaxYaml = GrandExchangeTaxYaml(),
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public data class GrandExchangePricesYaml(
+    val live: Boolean = true,
+    @JsonProperty("refresh-minutes") val refreshMinutes: Int = 5,
+    @JsonProperty("snapshot-path") val snapshotPath: String = ".data/ge/prices.json",
+    @JsonProperty("user-agent")
+    val userAgent: String = "OpenRune-Server GE price feed (private server) - github.com/OpenRune",
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public data class GrandExchangeTaxYaml(
+    val rate: Double = 0.02,
+    val cap: Long = 5_000_000,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
