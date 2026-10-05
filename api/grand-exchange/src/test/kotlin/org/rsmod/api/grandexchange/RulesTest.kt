@@ -79,31 +79,51 @@ class RulesTest {
                 OfferSlot.MAX_TOTAL,
                 tax = 123,
             )
-        assertEquals(extremes, SlotCodec.decode(SlotCodec.encode(extremes), extremes.tax))
         val sample = OfferSlot(OfferState.OPEN, OfferType.BUY, 4151, 10, 1_500, 4, 6_000, 0)
-        assertEquals(sample, SlotCodec.decode(SlotCodec.encode(sample)))
-        assertEquals(OfferSlot.EMPTY, SlotCodec.decode(SlotCodec.encode(OfferSlot.EMPTY)))
-        assertTrue(SlotCodec.encode(OfferSlot.EMPTY).all { it == 0 })
-        assertEquals(SlotCodec.WORDS, SlotCodec.encode(sample).size)
+        for (index in 0 until SlotCodec.SLOTS) {
+            val words = IntArray(SlotCodec.WORDS)
+            SlotCodec.write(words, index, extremes)
+            assertEquals(extremes, SlotCodec.read(words, index, extremes.tax))
+            SlotCodec.write(words, index, sample)
+            assertEquals(sample, SlotCodec.read(words, index))
+            SlotCodec.write(words, index, OfferSlot.EMPTY)
+            assertTrue(words.all { it == 0 }, "clearing slot $index leaves nothing behind")
+        }
+        assertEquals(39, SlotCodec.WORDS)
     }
 
     @Test
-    fun `random slot records round trip`() {
-        val random = Random(42)
-        repeat(5_000) {
-            val quantity = random.nextInt(1, Int.MAX_VALUE)
-            val slot =
-                OfferSlot(
-                    state = OfferState.entries[random.nextInt(1, 4)],
-                    type = OfferType.entries[random.nextInt(2)],
-                    itemId = random.nextInt(0, SlotCodec.MAX_ITEM_ID + 1),
-                    quantity = quantity,
-                    price = random.nextInt(1, Int.MAX_VALUE),
-                    completedQuantity = random.nextInt(0, quantity + 1),
-                    completedGold = random.nextLong(0, OfferSlot.MAX_TOTAL + 1),
-                )
-            assertEquals(slot, SlotCodec.decode(SlotCodec.encode(slot)))
+    fun `writing one slot never disturbs its neighbours`() {
+        val random = Random(7)
+        val words = IntArray(SlotCodec.WORDS)
+        val expected = Array(SlotCodec.SLOTS) { OfferSlot.EMPTY }
+        repeat(20_000) {
+            val index = random.nextInt(SlotCodec.SLOTS)
+            val slot = if (random.nextInt(5) == 0) OfferSlot.EMPTY else randomSlot(random)
+            val before = words.copyOf()
+            SlotCodec.write(words, index, slot)
+            expected[index] = slot
+            val touched = SlotCodec.wordsOf(index)
+            for (word in words.indices) {
+                if (word !in touched) assertEquals(before[word], words[word], "word $word")
+            }
+            for (other in 0 until SlotCodec.SLOTS) {
+                assertEquals(expected[other], SlotCodec.read(words, other), "slot $other")
+            }
         }
+    }
+
+    private fun randomSlot(random: Random): OfferSlot {
+        val quantity = random.nextInt(1, Int.MAX_VALUE)
+        return OfferSlot(
+            state = OfferState.entries[random.nextInt(1, 4)],
+            type = OfferType.entries[random.nextInt(2)],
+            itemId = random.nextInt(0, SlotCodec.MAX_ITEM_ID + 1),
+            quantity = quantity,
+            price = random.nextInt(1, Int.MAX_VALUE),
+            completedQuantity = random.nextInt(0, quantity + 1),
+            completedGold = random.nextLong(0, OfferSlot.MAX_TOTAL + 1),
+        )
     }
 
     @Test

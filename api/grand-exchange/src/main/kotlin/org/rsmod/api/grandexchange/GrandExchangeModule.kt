@@ -3,6 +3,7 @@ package org.rsmod.api.grandexchange
 import com.github.michaelbull.logging.InlineLogger
 import com.google.inject.Provider
 import dev.openrune.ServerCacheManager
+import dev.openrune.types.ItemServerType
 import jakarta.inject.Inject
 import okhttp3.OkHttpClient
 import org.rsmod.api.grandexchange.engine.GrandExchange
@@ -22,7 +23,6 @@ import org.rsmod.api.grandexchange.rules.GeTax
 import org.rsmod.api.grandexchange.rules.NoBuyLimits
 import org.rsmod.api.market.MarketPriceSource
 import org.rsmod.api.server.config.ServerConfig
-import org.rsmod.game.type.uncert
 import org.rsmod.plugin.module.PluginModule
 import org.rsmod.server.services.Service
 
@@ -111,10 +111,10 @@ internal class GrandExchangeGuidePrices
 @Inject
 constructor(private val prices: GePrices, private val settings: GrandExchangeSettings) :
     MarketPriceSource {
-    override fun guidePrice(type: dev.openrune.types.ItemServerType): Int? {
+    override fun guidePrice(type: ItemServerType): Int? {
         if (!settings.enabled) {
             return null
         }
-        return prices.guideOrNull(uncert(type).id)
+        return prices.guideOrNull(type.id)
     }
 }
