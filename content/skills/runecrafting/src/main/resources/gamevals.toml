@@ -60,6 +60,8 @@ runecrafting_tiara_air=65126
 blood_essence_charges=65529
 binding_necklace_charges=65528
 cordelia_pouch_repair_unlocked=65099
+rc_kourend_blood_crafted=64080
+rc_kourend_soul_crafted=64081
 
 [gamevals.varp]
 rcu_pouch_essence_type_small=65481

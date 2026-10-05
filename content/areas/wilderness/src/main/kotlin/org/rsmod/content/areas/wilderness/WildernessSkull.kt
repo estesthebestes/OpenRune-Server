@@ -57,6 +57,19 @@ internal fun Player.applySkull(
     refreshSkullIcon()
 }
 
+public fun Player.hasActiveSkull(): Boolean = isSkulled()
+
+/**
+ * Entering the Abyss resets a timed skull to the Abyss duration; an equipment-locked skull is
+ * permanent and is left alone.
+ */
+public fun Player.applyAbyssSkull() {
+    if (isSkullEquipLocked()) {
+        return
+    }
+    applySkull(SkullSource.ABYSS)
+}
+
 internal fun Player.applyEquipmentSkull() {
     attr[IS_SKULLED] = true
     attr[SKULL_ICON_TYPE] = constants.skullicon_default
@@ -165,7 +178,6 @@ internal fun Player.refreshSkullIcon() {
         cappedKeyCount > 0 -> constants.skullicon_loot_key_1 + (cappedKeyCount - 1)
         else -> baseIcon
     }
-
 }
 
 internal fun Player.refreshSkullIconIfLootKeysChanged() {

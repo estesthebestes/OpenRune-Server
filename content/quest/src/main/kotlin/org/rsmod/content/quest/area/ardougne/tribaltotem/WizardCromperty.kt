@@ -10,6 +10,7 @@ import org.rsmod.content.quest.area.ardougne.tribaltotem.TribalTotemQuest.Compan
 import org.rsmod.content.quest.area.ardougne.tribaltotem.TribalTotemQuest.Companion.DepotLanding
 import org.rsmod.content.quest.area.ardougne.tribaltotem.TribalTotemQuest.Companion.Started
 import org.rsmod.content.quest.area.ardougne.tribaltotem.TribalTotemQuest.Companion.TrapFound
+import org.rsmod.content.skills.runecrafting.essence.EssenceMineTeleporter
 import org.rsmod.content.skills.runecrafting.essence.teleportToRuneEssenceMine
 import org.rsmod.map.CoordGrid
 import org.rsmod.plugin.scripts.PluginScript
@@ -28,7 +29,7 @@ class WizardCromperty @Inject constructor(private val tribalTotem: TribalTotemQu
     override fun ScriptContext.startup() {
         for (cromperty in listOf(CrompertyPre, CrompertyPost)) {
             onOpNpc1(cromperty) { startDialogue(it.npc) { crompertyDialogue() } }
-            onOpNpc3(cromperty) { teleportToRuneEssenceMine(it.npc) }
+            onOpNpc3(cromperty) { teleportToRuneEssenceMine(it.npc, EssenceMineTeleporter.Cromperty) }
         }
     }
 
@@ -56,7 +57,7 @@ class WizardCromperty @Inject constructor(private val tribalTotem: TribalTotemQu
             }
             else -> {
                 chatPlayer(quiz, "Can you teleport me to the Rune Essence?")
-                teleportToRuneEssenceMine()
+                teleportToRuneEssenceMine(EssenceMineTeleporter.Cromperty)
             }
         }
     }

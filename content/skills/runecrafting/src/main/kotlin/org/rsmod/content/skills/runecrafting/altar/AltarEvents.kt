@@ -137,8 +137,14 @@ class AltarEvents @Inject constructor(
             return
         }
 
+        val kourend = KourendAltar.byAltar(altar.altarObject.internalName)
         onOpLoc1(altar.altarObject.internalName) {
+            val rune = altar.rune.output.internalName
+            val before = inv.count(rune)
             craftRune(altar.rune, xpMods)
+            if (kourend != null && inv.count(rune) > before) {
+                kourend.markCrafted(player)
+            }
         }
     }
 

@@ -15,8 +15,8 @@ enum class AltarData(
     val entrance: Int? = null,
     val exit: Int? = null,
     val option: String = "craft-rune",
-    val row : String,
-    val combo : List<CombinationRuneData> = emptyList()
+    val row: String,
+    val combo: List<CombinationRuneData> = emptyList()
 ) {
     AIR(
         ruins = listOf("loc.airtemple_ruined_old", "loc.airtemple_ruined_new"),
@@ -176,8 +176,11 @@ enum class AltarData(
     ),
     BLOOD(
         altar = "loc.blood_altar",
+        exitPortal = "loc.bloodtemple_exit_portal",
         rune = Rune.BLOOD,
         option = "bind",
+        entrance = Coord(3226, 4832).pack(),
+        exit = Coord(3560, 9779).pack(),
         row = "dbrow.runecrafting_altar_blood",
     ),
     BLOOD_KOUREND(
@@ -277,10 +280,7 @@ object Alters {
                 if (it.combo.isNotEmpty()) {
                     columnRSCM(COMBO, *it.combo.map { combo -> combo.row }.toTypedArray())
                 }
-
             }
         }
-
     }
-
 }

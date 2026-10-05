@@ -1,0 +1,6 @@
+[[varbit]]
+isServerOnly = true
+id = "varbit.abyssal_miniquest_progress"
+varp = "varp.abyssal_miniquest"
+startBit = 0
+endBit = 2

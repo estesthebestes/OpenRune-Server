@@ -140,6 +140,20 @@ endBit = 14
 
 [[varbit]]
 isServerOnly = true
+id = "varbit.rc_kourend_blood_crafted"
+varp = "varp.generic_storage_65531"
+startBit = 15
+endBit = 15
+
+[[varbit]]
+isServerOnly = true
+id = "varbit.rc_kourend_soul_crafted"
+varp = "varp.generic_storage_65531"
+startBit = 16
+endBit = 16
+
+[[varbit]]
+isServerOnly = true
 id = "varbit.coal_bag_storage_count"
 varp = "varp.generic_storage_65531"
 startBit = 25

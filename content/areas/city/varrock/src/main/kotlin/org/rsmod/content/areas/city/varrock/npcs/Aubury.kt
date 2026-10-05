@@ -11,6 +11,7 @@ import org.rsmod.api.script.onOpNpc4
 import org.rsmod.api.shops.Shops
 import org.rsmod.content.quest.area.lumbridge.RuneMysteriesQuest
 import org.rsmod.content.quest.area.lumbridge.rmNotes
+import org.rsmod.content.skills.runecrafting.essence.EssenceMineTeleporter
 import org.rsmod.content.skills.runecrafting.essence.teleportToRuneEssenceMine
 import org.rsmod.game.entity.Npc
 import org.rsmod.game.entity.Player
@@ -28,7 +29,7 @@ class Aubury @Inject constructor(
     override fun ScriptContext.startup() {
         onOpNpc1("npc.aubury") { startAuburyDialogue(it.npc) }
         onOpNpc3("npc.aubury") { player.openAuburyShop(it.npc) }
-        onOpNpc4("npc.aubury") { teleportToRuneEssenceMine(it.npc) }
+        onOpNpc4("npc.aubury") { teleportToRuneEssenceMine(it.npc, EssenceMineTeleporter.Aubury) }
     }
 
     private suspend fun ProtectedAccess.startAuburyDialogue(npc: Npc) {
@@ -214,7 +215,7 @@ class Aubury @Inject constructor(
                         "Of course. By the way, if you end up making any runes from the essence you " +
                             "mine, I'll happily buy them from you.",
                     )
-                    teleportToRuneEssenceMine()
+                    teleportToRuneEssenceMine(EssenceMineTeleporter.Aubury)
                 }
             }
         } else {

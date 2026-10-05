@@ -87,6 +87,7 @@ plaguecity_met_jethick = 63904
 plaguecity_got_note = 63905
 plaguecity_read_scroll = 63906
 tribal_totem_progress = 63960
+abyssal_miniquest_progress = 64082
 
 [gamevals.models]
 misthalin_gem_diamond = 32333

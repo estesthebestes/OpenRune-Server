@@ -14,5 +14,6 @@ dependencies {
     implementation(projects.api.serverConfig)
     implementation(projects.content.generic.genericLocs)
     implementation(projects.content.skills.runecrafting)
+    implementation(projects.content.areas.wilderness)
     implementation(libs.rsprot.api)
 }

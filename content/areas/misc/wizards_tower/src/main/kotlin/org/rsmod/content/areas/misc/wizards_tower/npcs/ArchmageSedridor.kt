@@ -13,6 +13,7 @@ import org.rsmod.content.quest.area.lumbridge.rmNotesGiven
 import org.rsmod.content.quest.area.lumbridge.rmOwedTalisman
 import org.rsmod.content.quest.area.lumbridge.rmPackage
 import org.rsmod.content.quest.area.lumbridge.rmTalismanGiven
+import org.rsmod.content.skills.runecrafting.essence.EssenceMineTeleporter
 import org.rsmod.content.skills.runecrafting.essence.teleportToRuneEssenceMine
 import org.rsmod.game.entity.Npc
 import org.rsmod.game.entity.Player
@@ -29,7 +30,7 @@ class ArchmageSedridor @Inject constructor(private val runeMysteries: RuneMyster
 
     override fun ScriptContext.startup() {
         onOpNpc1("npc.head_wizard") { startSedridorDialogue(it.npc) }
-        onOpNpc3("npc.head_wizard") { teleportToRuneEssenceMine(it.npc) }
+        onOpNpc3("npc.head_wizard") { teleportToRuneEssenceMine(it.npc, EssenceMineTeleporter.Sedridor) }
     }
 
     private suspend fun ProtectedAccess.startSedridorDialogue(npc: Npc) {
@@ -433,7 +434,7 @@ class ArchmageSedridor @Inject constructor(private val runeMysteries: RuneMyster
 
         when (choice2("I'd better get going.", 1, "Can you teleport me to the Rune Essence Mine?", 2)) {
             1 -> chatPlayer(happy, "I'd better get going.")
-            2 -> teleportToRuneEssenceMine()
+            2 -> teleportToRuneEssenceMine(EssenceMineTeleporter.Sedridor)
         }
     }
 
@@ -476,7 +477,7 @@ class ArchmageSedridor @Inject constructor(private val runeMysteries: RuneMyster
                 4,
             )
         ) {
-            1 -> teleportToRuneEssenceMine()
+            1 -> teleportToRuneEssenceMine(EssenceMineTeleporter.Sedridor)
             2 -> {
                 chatPlayer(quiz, "Who else knows the teleport to the Rune Essence Mine?")
                 player.rmKnowOthers = true
