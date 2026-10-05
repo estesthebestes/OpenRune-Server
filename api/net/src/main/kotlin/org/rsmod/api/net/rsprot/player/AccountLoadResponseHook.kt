@@ -301,6 +301,9 @@ class AccountLoadResponseHook(
     public val LOGIN_EXIT_COORD: AttributeKey<Int> = AttributeKey(persistenceKey = "instance_exit_coord")
 
     private fun Player.applyConfigTransforms(config: RealmConfig) {
+        if (membersWorld) {
+            members = true
+        }
         if (!newAccount) {
             val hasExit = attr[LOGIN_EXIT_COORD]
             if (hasExit != null) {
@@ -313,9 +316,6 @@ class AccountLoadResponseHook(
 
         coords = config.spawnCoord
         xpRate = config.baseXpRate
-        if (membersWorld) {
-            members = true
-        }
         if (config.autoAssignDisplayNames) {
             displayName = username.toDisplayName()
         }
