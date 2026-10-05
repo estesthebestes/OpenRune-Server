@@ -16288,3 +16288,8 @@ defaultMode = "None"
 id = "npc.leviathan_tail_ring_3"
 inherit = "npc.leviathan_tail_ring_3"
 defaultMode = "None"
+
+[[npc]]
+id = "npc.poh_sawmill_opp"
+inherit = "npc.poh_sawmill_opp"
+wanderRange = 0
