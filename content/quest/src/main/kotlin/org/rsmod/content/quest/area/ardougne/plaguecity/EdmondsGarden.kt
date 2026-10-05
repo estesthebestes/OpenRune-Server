@@ -74,6 +74,8 @@ class EdmondsGarden @Inject constructor(private val plagueCity: PlagueCityQuest)
     private suspend fun ProtectedAccess.digPatch() {
         when {
             player.mudDug -> climbDown()
+            plagueCity.quest.isQuestCompleted(player) ->
+                objbox(SPADE, "The ground's been filled in and packed hard.")
             plagueCity.stage(player) != STAGE_SOIL_SOFTENED ->
                 mesbox("You dig the soil... The ground is rather hard.")
             else -> tunnelThrough()

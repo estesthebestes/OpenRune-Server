@@ -66,6 +66,14 @@ grill_pulled = 1473
 fall_land = 2455
 vial_mix = 2611
 exploding_vial = 1486
+# Biohazard
+flapping = 880
+throw = 1576
+bird_twitter_1 = 1984
+bubbling_soup = 2197
+jump_and_fall = 2463
+ropeclimb = 2482
+bubbling_vials = 3118
 
 [gamevals.varp]
 restless_ghost_rising_tile = 63703
@@ -74,6 +82,7 @@ misthalin_return_tile = 63700
 misthalin_mirror_blocker = 63701
 misthalin_puzzle_state = 63702
 plaguecity_state = 63900
+biohazard_state = 63920
 
 [gamevals.varbit]
 restless_ghost_progress = 63702
@@ -86,6 +95,13 @@ plaguecity_told_to_dig = 63903
 plaguecity_met_jethick = 63904
 plaguecity_got_note = 63905
 plaguecity_read_scroll = 63906
+biohazard_progress = 63921
+biohazard_birdfeed_thrown = 63922
+biohazard_chancy_vial = 63923
+biohazard_davinci_vial = 63924
+biohazard_hops_vial = 63925
+biohazard_dummy_hits = 63926
+biohazard_met_jerico = 63927
 
 [gamevals.models]
 misthalin_gem_diamond = 32333

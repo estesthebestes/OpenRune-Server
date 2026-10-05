@@ -1,12 +1,15 @@
 package org.rsmod.content.areas.city.rimmington.npcs
 
+import jakarta.inject.Inject
 import org.rsmod.api.player.dialogue.Dialogue
 import org.rsmod.api.script.onOpNpc1
+import org.rsmod.content.quest.area.ardougne.biohazard.Smuggling
 import org.rsmod.game.entity.Npc
 import org.rsmod.plugin.scripts.PluginScript
 import org.rsmod.plugin.scripts.ScriptContext
 
-class RimmingtonTownsfolkScript : PluginScript() {
+class RimmingtonTownsfolkScript @Inject constructor(private val biohazardChemist: Smuggling) :
+    PluginScript() {
     override fun ScriptContext.startup() {
         onOpNpc1("npc.hw18_girl") { startDialogue(it.npc) { chatNpc(shifty, "We don't talk to strangers.") } }
         onOpNpc1("npc.hw18_boy") { startDialogue(it.npc) { chatNpc(shifty, "Sorry, we don't talk to strangers.") } }
@@ -25,27 +28,11 @@ class RimmingtonTownsfolkScript : PluginScript() {
     }
 
     private suspend fun Dialogue.chemist() {
+        if (with(biohazardChemist) { chemistQuest { lampOil() } }) {
+            return
+        }
         if (choice2("Yes.", true, "No.", false, title = "Do you want to talk about lamps?")) {
-            chatPlayer(quiz, "Hi, I need fuel for a lamp.")
-            chatNpc(
-                happy,
-                "Hello there, the fuel you need is lamp oil, do you need help making it?",
-            )
-            if (!choice2("Yes please.", true, "No thanks.", false, title = "Select an Option")) {
-                chatPlayer(neutral, "No thanks.")
-                return
-            }
-            chatPlayer(happy, "Yes please.")
-            chatNpc(
-                neutral,
-                "It's really quite simple.  You use the small still in here.  It's all set up, " +
-                    "so there's no fiddling around with dials...",
-            )
-            chatNpc(
-                neutral,
-                "Just put ordinary swamp tar in, and then use a lantern or lamp to get the oil out.",
-            )
-            chatPlayer(happy, "Thanks.")
+            lampOil()
             return
         }
         chatPlayer(happy, "Hello.")
@@ -53,6 +40,29 @@ class RimmingtonTownsfolkScript : PluginScript() {
         chatPlayer(happy, "Good thanks.")
         chatNpc(neutral, "Good to hear, sorry but I have a few things to do right now.")
         chatPlayer(neutral, "Well I'd better let you get on then.")
+    }
+
+    private suspend fun Dialogue.lampOil() {
+        chatPlayer(quiz, "Hi, I need fuel for a lamp.")
+        chatNpc(
+            happy,
+            "Hello there, the fuel you need is lamp oil, do you need help making it?",
+        )
+        if (!choice2("Yes please.", true, "No thanks.", false, title = "Select an Option")) {
+            chatPlayer(neutral, "No thanks.")
+            return
+        }
+        chatPlayer(happy, "Yes please.")
+        chatNpc(
+            neutral,
+            "It's really quite simple.  You use the small still in here.  It's all set up, " +
+                "so there's no fiddling around with dials...",
+        )
+        chatNpc(
+            neutral,
+            "Just put ordinary swamp tar in, and then use a lantern or lamp to get the oil out.",
+        )
+        chatPlayer(happy, "Thanks.")
     }
 
     private suspend fun Dialogue.householder(npc: Npc, scream: String) {

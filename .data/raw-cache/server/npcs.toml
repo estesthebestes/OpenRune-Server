@@ -16288,3 +16288,45 @@ defaultMode = "None"
 id = "npc.leviathan_tail_ring_3"
 inherit = "npc.leviathan_tail_ring_3"
 defaultMode = "None"
+
+# Biohazard: Elena at home. Her house is small and its door swings open along the inside of the
+# doorway, so if she wanders into the corner by the door nobody can reach her to start the quest.
+[[npc]]
+id = "npc.elena2"
+inherit = "npc.elena2"
+wanderRange = 0
+
+# Biohazard: the chemist's errand boys in the Dancing Donkey Inn. Chancy and Da Vinci are
+# invisible click targets sitting inside the animated npc table (the seated figures are part of
+# the table model), so they must never leave their seats or nothing is left to talk to.
+[[npc]]
+id = "npc.gambler2"
+inherit = "npc.gambler2"
+moveRestrict = "NoMove"
+wanderRange = 0
+
+[[npc]]
+id = "npc.artist2"
+inherit = "npc.artist2"
+moveRestrict = "NoMove"
+wanderRange = 0
+
+[[npc]]
+id = "npc.drunk2"
+inherit = "npc.drunk2"
+moveRestrict = "NoMove"
+wanderRange = 0
+
+# Biohazard: Guidor stays in his rocking chair and King Lathas on his throne; both have seated
+# idle animations and drifting off the seat made them awkward or impossible to reach.
+[[npc]]
+id = "npc.guidor"
+inherit = "npc.guidor"
+moveRestrict = "NoMove"
+wanderRange = 0
+
+[[npc]]
+id = "npc.kinglathas"
+inherit = "npc.kinglathas"
+moveRestrict = "NoMove"
+wanderRange = 0

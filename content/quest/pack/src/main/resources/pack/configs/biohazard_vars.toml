@@ -1,0 +1,54 @@
+[[varbit]]
+isServerOnly = true
+id = "varbit.biohazard_progress"
+varp = "varp.biohazard"
+startBit = 0
+endBit = 4
+
+[[varp]]
+isServerOnly = true
+id = "varp.biohazard_state"
+scope = "Perm"
+transmit = "Never"
+
+[[varbit]]
+isServerOnly = true
+id = "varbit.biohazard_birdfeed_thrown"
+varp = "varp.biohazard_state"
+startBit = 0
+endBit = 0
+
+[[varbit]]
+isServerOnly = true
+id = "varbit.biohazard_chancy_vial"
+varp = "varp.biohazard_state"
+startBit = 1
+endBit = 2
+
+[[varbit]]
+isServerOnly = true
+id = "varbit.biohazard_davinci_vial"
+varp = "varp.biohazard_state"
+startBit = 3
+endBit = 4
+
+[[varbit]]
+isServerOnly = true
+id = "varbit.biohazard_hops_vial"
+varp = "varp.biohazard_state"
+startBit = 5
+endBit = 6
+
+[[varbit]]
+isServerOnly = true
+id = "varbit.biohazard_dummy_hits"
+varp = "varp.biohazard_state"
+startBit = 7
+endBit = 9
+
+[[varbit]]
+isServerOnly = true
+id = "varbit.biohazard_met_jerico"
+varp = "varp.biohazard_state"
+startBit = 10
+endBit = 10
