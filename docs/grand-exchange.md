@@ -160,3 +160,21 @@ See the checklist in the task report; the short version: open at a clerk, buy at
 market price, sell, abort, collect (notes, items, bank), history, trade between two players,
 ironman refusal, and restart the server offline (`prices.live: false`) to confirm the snapshot is
 used.
+
+## Debugging the offer price
+
+The client cannot send a var back to the server, so the price (and quantity) in the setup panel is
+mirrored: every button op runs the same arithmetic on the server (`OfferMath`) and the server then
+writes its absolute value to `varplayer_5753`. `confirm` places the offer with that server value.
+`GeOfferFlowTest` drives the real handlers against a port of the client's arithmetic to keep the two
+in step. With the `org.rsmod.content.interfaces.grandexchange` logger at `DEBUG` the live log shows:
+
+- `GE button: ...` every op, with the price and quantity held when it arrived;
+- `GE price: ... source=<+5%|-5%|+1|-1|guide|enter|+10%x|guide-on-select|restore> before=.. stored=..
+  sentToClient=..` every time the price is set and mirrored to the client;
+- `GE quantity: ... before=.. after=..`;
+- `GE confirm: ... price=..` and `GE placed: ... price=.. filled=.. state=..` for the offer as sent to
+  the exchange and as it was stored (state `OPEN` is a resting offer).
+
+If the price shown in the client ever differs from the `GE confirm` line, look for a `GE button`
+line missing for the last click (the engine drops modal buttons while a script is suspended).

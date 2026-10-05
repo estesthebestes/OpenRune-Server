@@ -72,7 +72,7 @@ constructor(
         player.geSearchItem = info.id
         player.geLastSearched = info.id
         player.geNewOfferQuantity = quantity.coerceAtLeast(1)
-        setPrice(player, price ?: marketPrice(info.id, type))
+        setPrice(player, price ?: marketPrice(info.id, type), if (price == null) "guide-on-select" else "restore")
         describe(player, info.id, type, setup = true)
         refreshPanel(player)
     }
@@ -82,10 +82,15 @@ constructor(
         return if (type == OfferType.BUY) quote.buyAt else quote.sellAt
     }
 
-    fun setPrice(player: Player, price: Long) {
+    fun setPrice(player: Player, price: Long, source: String = "set") {
         val clamped = price.coerceIn(0L, OfferMath.MAX_PRICE)
+        val before = player.geOfferPrice
         player.geOfferPrice = clamped.toInt()
         StockMarket.writeVarpLong(player, GeIds.CLIENT_OFFER_PRICE_VARP, clamped)
+        logger.debug {
+            "GE price: player=${player.username} source=$source before=$before requested=$price " +
+                "stored=$clamped sentToClient=$clamped"
+        }
     }
 
     fun describe(player: Player, itemId: Int, type: OfferType, setup: Boolean) {

@@ -277,15 +277,21 @@ constructor(
                     IfButtonOp.Op2 -> buyAllAffordable(type)
                     else -> Unit
                 }
-            CHILD_PRICE_MINUS -> if (op == IfButtonOp.Op1) changePrice(OfferMath.stepPrice(price(), up = false))
-            CHILD_PRICE_PLUS -> if (op == IfButtonOp.Op1) changePrice(OfferMath.stepPrice(price(), up = true))
+            CHILD_PRICE_MINUS ->
+                if (op == IfButtonOp.Op1) changePrice("-1", OfferMath.stepPrice(price(), up = false))
+            CHILD_PRICE_PLUS ->
+                if (op == IfButtonOp.Op1) changePrice("+1", OfferMath.stepPrice(price(), up = true))
             CHILD_PRICE_MINUS_5 ->
-                if (op == IfButtonOp.Op1) changePrice(OfferMath.stepPricePercent(price(), 5, up = false))
+                if (op == IfButtonOp.Op1) {
+                    changePrice("-5%", OfferMath.stepPricePercent(price(), 5, up = false))
+                }
             CHILD_PRICE_PLUS_5 ->
-                if (op == IfButtonOp.Op1) changePrice(OfferMath.stepPricePercent(price(), 5, up = true))
+                if (op == IfButtonOp.Op1) {
+                    changePrice("+5%", OfferMath.stepPricePercent(price(), 5, up = true))
+                }
             CHILD_PRICE_GUIDE ->
                 if (op == IfButtonOp.Op1) {
-                    changePrice(setup.marketPrice(selected, type))
+                    changePrice("guide", setup.marketPrice(selected, type))
                     setup.refreshPanel(player)
                 }
             CHILD_PRICE_ENTER -> if (op == IfButtonOp.Op1) enterPrice()
@@ -296,21 +302,26 @@ constructor(
 
     private fun ProtectedAccess.price(): Long = player.geOfferPrice.toLong()
 
-    private fun ProtectedAccess.changePrice(price: Long) {
-        setup.setPrice(player, price)
+    private fun ProtectedAccess.changePrice(source: String, price: Long) {
+        setup.setPrice(player, price, source)
     }
 
     private fun ProtectedAccess.stepQuantity(delta: Int) {
         val type = OfferType.fromCode(player.geNewOfferType)
         val item = player.geSearchItem
+        val before = player.geNewOfferQuantity
         player.geNewOfferQuantity =
             OfferMath.stepQuantity(
-                current = player.geNewOfferQuantity,
+                current = before,
                 delta = delta,
                 type = type,
                 available = available(item),
                 isBond = item == BOND_ID && type == OfferType.BUY,
             )
+        logger.debug {
+            "GE quantity: player=${player.username} delta=$delta before=$before " +
+                "after=${player.geNewOfferQuantity}"
+        }
     }
 
     private suspend fun ProtectedAccess.enterQuantity(type: OfferType) {
@@ -334,7 +345,7 @@ constructor(
     private suspend fun ProtectedAccess.enterPrice() {
         val entered = countDialog("Set a price for each item:")
         if (entered > 0 && player.geSearchItem > 0) {
-            setup.setPrice(player, entered.toLong())
+            setup.setPrice(player, entered.toLong(), "enter")
             setup.refreshPanel(player)
         }
     }
@@ -344,7 +355,8 @@ constructor(
             IfButtonOp.Op1 -> {
                 val percent = player.gePriceCustom
                 if (percent > 0) {
-                    setup.setPrice(player, OfferMath.stepPricePercent(price(), percent, up))
+                    val label = (if (up) "+" else "-") + percent + "%x"
+                    setup.setPrice(player, OfferMath.stepPricePercent(price(), percent, up), label)
                     setup.refreshPanel(player)
                 }
             }
@@ -396,21 +408,33 @@ constructor(
         val slot = player.geSelectedSlot - 1
         val item = player.geSearchItem
         val price = player.geOfferPrice.toLong()
-        if (slot !in 0 until SlotCodec.SLOTS || item <= 0 || price <= 0) {
-            return
-        }
         val type = OfferType.fromCode(player.geNewOfferType)
         val quantity = player.geNewOfferQuantity
+        logger.debug {
+            "GE confirm: player=${player.username} slot=$slot type=$type item=$item " +
+                "quantity=$quantity price=$price"
+        }
+        if (slot !in 0 until SlotCodec.SLOTS || item <= 0 || price <= 0) {
+            logger.debug { "GE confirm ignored: no valid slot, item or price" }
+            return
+        }
         val session = sessions.of(player)
         when (val result = exchange.place(session, slot, type, item, quantity, price)) {
             is PlaceResult.Placed -> {
+                logger.debug {
+                    "GE placed: slot=$slot price=${result.slot.price} " +
+                        "filled=${result.filledQuantity} state=${result.slot.state}"
+                }
                 player.geLastOfferItem = item
                 player.geLastOfferQuantity = quantity
                 player.geLastOfferPrice = price.toInt()
                 player.geLastOfferType = type.code
                 setup.view(player, slot, item, type)
             }
-            is PlaceResult.Rejected -> mes(rejection(result.reason, type))
+            is PlaceResult.Rejected -> {
+                logger.debug { "GE place rejected: ${result.reason}" }
+                mes(rejection(result.reason, type))
+            }
         }
     }
 
