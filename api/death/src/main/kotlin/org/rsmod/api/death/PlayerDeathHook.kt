@@ -37,6 +37,7 @@ public data class PlayerDeathHandling(
     val revealDelay: Int,
     val supplyPile: Boolean,
     val untradeableHandling: UntradeableHandling,
+    val keepInventory: Boolean = false,
 )
 
 public enum class UntradeableHandling {
@@ -49,5 +50,9 @@ public enum class UntradeableHandling {
 public const val RECENT_PVP_HIT_TICKS: Int = 600
 
 public interface PlayerDeathHook {
+    /** Hooks with a higher priority are asked first. Hooks of equal priority keep binding order. */
+    public val priority: Int
+        get() = 0
+
     public fun handleDeath(context: PlayerDeathContext): PlayerDeathHandling?
 }

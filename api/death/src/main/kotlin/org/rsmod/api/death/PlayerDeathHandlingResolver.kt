@@ -13,7 +13,7 @@ constructor(
     private val hooks: Set<PlayerDeathHook>,
 ) {
     public fun resolve(context: PlayerDeathContext): PlayerDeathHandling {
-        for (hook in hooks) {
+        for (hook in hooks.sortedByDescending { it.priority }) {
             val handling = hook.handleDeath(context)
             if (handling != null) return handling
         }

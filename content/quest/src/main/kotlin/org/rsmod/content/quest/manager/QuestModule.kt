@@ -1,10 +1,12 @@
 package org.rsmod.content.quest.manager
 
 import org.rsmod.api.combat.commons.magic.SpellQuestRequirement
+import org.rsmod.api.death.PlayerDeathHook
 import org.rsmod.api.player.hook.SpadeDigHook
 import org.rsmod.content.quest.area.ardougne.QuestDoors
 import org.rsmod.content.quest.area.ardougne.fightarena.ArenaInstance
 import org.rsmod.content.quest.area.ardougne.fightarena.ArenaSite
+import org.rsmod.content.quest.area.ardougne.fightarena.FightArenaDeathHook
 import org.rsmod.content.quest.area.ardougne.fightarena.FightArenaDoors
 import org.rsmod.content.quest.area.ardougne.fightarena.FightArenaScenes
 import org.rsmod.content.quest.area.ardougne.plaguecity.EdmondsGarden
@@ -28,5 +30,6 @@ public class QuestModule : PluginModule() {
         addSetBinding<SpellQuestRequirement>(PolicySpellQuestRequirement::class.java)
         addSetBinding<SpadeDigHook>(XMarksTheSpot::class.java)
         addSetBinding<SpadeDigHook>(EdmondsGarden::class.java)
+        addSetBinding<PlayerDeathHook>(FightArenaDeathHook::class.java)
     }
 }
