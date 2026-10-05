@@ -2381,3 +2381,15 @@ contentGroup = "content.ladder_down"
 id = "loc.duke_sucellus_salt"
 inherit = "loc.duke_sucellus_salt"
 contentGroup = "content.rock"
+
+# Grand Exchange bank booths: Bank is the generic bank booth op, Collect is the exchange script.
+
+[[object]]
+id = "loc.exchange_bank_wall_bank"
+inherit = "loc.exchange_bank_wall_bank"
+contentGroup = "content.bank_booth"
+
+[[object]]
+id = "loc.exchange_bank_wall_bank_3ops"
+inherit = "loc.exchange_bank_wall_bank_3ops"
+contentGroup = "content.bank_booth"
