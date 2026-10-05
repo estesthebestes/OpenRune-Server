@@ -39,6 +39,7 @@ import org.rsmod.api.player.input.ResumePObjDialogInput
 import org.rsmod.api.player.protect.ProtectedAccess
 import org.rsmod.api.player.protect.ProtectedAccessContextFactory
 import org.rsmod.api.player.ui.IfModalButton
+import org.rsmod.coroutine.GameCoroutine
 import org.rsmod.events.EventBus
 import org.rsmod.game.cheat.CheatCommandMap
 import org.rsmod.game.client.Client
@@ -47,7 +48,6 @@ import org.rsmod.game.inv.InvObj
 import org.rsmod.game.inv.InvVirtualStorageHolder
 import org.rsmod.game.inv.Inventory
 import org.rsmod.game.queue.EngineQueueCache
-import org.rsmod.coroutine.GameCoroutine
 import org.rsmod.plugin.scripts.ScriptContext
 
 /**
