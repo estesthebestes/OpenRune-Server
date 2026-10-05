@@ -38,6 +38,8 @@ public data class GameplayConfig(
     val questRequirements: QuestRequirementsYaml = QuestRequirementsYaml(),
     @JsonProperty("drop-rates")
     val dropRates: DropRatesYaml = DropRatesYaml(),
+    /** Treat every character as a member on this world, whatever its account flag says. */
+    @JsonProperty("members-world") val membersWorld: Boolean = false,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)

@@ -7,6 +7,8 @@ environment: "LIVE"
 world: 255
 
 gameplay:
+  # Every character counts as a member on this world (members-only quests, content and xp).
+  members-world: false
   drop-rates:
     # Server-wide multiplier for drops flagged `boosted` (2.0 turns 1/512 into 1/256). Stacks with
     # each player's own multiplier (varp.drop_rate_multiplier, percent; 0 = unset).

@@ -37,6 +37,7 @@ class AccountLoadResponseHook(
     private val world: Int,
     private val config: RealmConfig,
     private val loginTimingLogs: Boolean,
+    private val membersWorld: Boolean,
     private val update: GameUpdate,
     private val eventBus: EventBus,
     private val accountRegistry: AccountRegistry,
@@ -312,6 +313,9 @@ class AccountLoadResponseHook(
 
         coords = config.spawnCoord
         xpRate = config.baseXpRate
+        if (membersWorld) {
+            members = true
+        }
         if (config.autoAssignDisplayNames) {
             displayName = username.toDisplayName()
         }

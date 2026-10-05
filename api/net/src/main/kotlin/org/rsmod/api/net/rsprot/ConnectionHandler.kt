@@ -126,6 +126,7 @@ private constructor(
                 world = world,
                 config = realmConfig,
                 loginTimingLogs = config.loginTimingLogs,
+                membersWorld = config.gameplay.membersWorld,
                 update = update,
                 eventBus = eventBus,
                 accountRegistry = accountReg,
