@@ -27,11 +27,10 @@ import org.rsmod.api.grandexchange.rules.GeTax
 import org.rsmod.api.inv.storage.PlayerItemStorage
 import org.rsmod.api.invtx.InvTransactionsScript
 import org.rsmod.api.player.dialogue.align.TextAlignment
-import org.rsmod.api.player.input.ResumePauseButtonInput
-import org.rsmod.api.player.ironman.PlayerGamemode
 import org.rsmod.api.player.events.interact.NpcEvents
+import org.rsmod.api.player.input.ResumePauseButtonInput
 import org.rsmod.api.player.interact.NpcInteractions
-import org.rsmod.game.interact.InteractionOp
+import org.rsmod.api.player.ironman.PlayerGamemode
 import org.rsmod.api.player.protect.ProtectedAccess
 import org.rsmod.api.player.protect.ProtectedAccessContextFactory
 import org.rsmod.api.player.protect.clearPendingAction
@@ -41,6 +40,7 @@ import org.rsmod.game.cheat.CheatCommandMap
 import org.rsmod.game.client.Client
 import org.rsmod.game.entity.Npc
 import org.rsmod.game.entity.Player
+import org.rsmod.game.interact.InteractionOp
 import org.rsmod.game.inv.InvObj
 import org.rsmod.game.inv.InvVirtualStorageHolder
 import org.rsmod.game.inv.Inventory

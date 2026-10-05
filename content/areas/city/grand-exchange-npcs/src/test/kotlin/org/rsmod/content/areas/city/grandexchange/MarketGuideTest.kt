@@ -1,7 +1,7 @@
 package org.rsmod.content.areas.city.grandexchange
 
-import dev.openrune.ServerCacheManager
 import dev.openrune.OsrsCacheProvider
+import dev.openrune.ServerCacheManager
 import dev.openrune.definition.type.InventoryType
 import dev.openrune.filesystem.Cache
 import dev.openrune.rscm.RSCM.asRSCM
@@ -22,8 +22,8 @@ import org.junit.jupiter.api.parallel.ResourceLock
 import org.rsmod.api.npc.events.AiTimerEvents
 import org.rsmod.api.player.interact.NpcInteractions
 import org.rsmod.events.EventBus
-import org.rsmod.game.entity.Player
 import org.rsmod.game.entity.Npc
+import org.rsmod.game.entity.Player
 import org.rsmod.map.CoordGrid
 
 @Execution(ExecutionMode.SAME_THREAD)
