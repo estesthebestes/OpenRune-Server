@@ -284,7 +284,10 @@ constructor(
             CHILD_PRICE_PLUS_5 ->
                 if (op == IfButtonOp.Op1) changePrice(OfferMath.stepPricePercent(price(), 5, up = true))
             CHILD_PRICE_GUIDE ->
-                if (op == IfButtonOp.Op1) changePrice(setup.marketPrice(selected, type))
+                if (op == IfButtonOp.Op1) {
+                    changePrice(setup.marketPrice(selected, type))
+                    setup.refreshPanel(player)
+                }
             CHILD_PRICE_ENTER -> if (op == IfButtonOp.Op1) enterPrice()
             CHILD_PRICE_MINUS_X -> customPercent(op, up = false)
             CHILD_PRICE_PLUS_X -> customPercent(op, up = true)
@@ -318,6 +321,7 @@ constructor(
         }
         val cap = if (type == OfferType.SELL) available(player.geSearchItem) else Int.MAX_VALUE
         player.geNewOfferQuantity = entered.coerceIn(1, cap)
+        setup.refreshPanel(player)
     }
 
     private fun ProtectedAccess.buyAllAffordable(type: OfferType) {
@@ -331,6 +335,7 @@ constructor(
         val entered = countDialog("Set a price for each item:")
         if (entered > 0 && player.geSearchItem > 0) {
             setup.setPrice(player, entered.toLong())
+            setup.refreshPanel(player)
         }
     }
 
@@ -340,6 +345,7 @@ constructor(
                 val percent = player.gePriceCustom
                 if (percent > 0) {
                     setup.setPrice(player, OfferMath.stepPricePercent(price(), percent, up))
+                    setup.refreshPanel(player)
                 }
             }
             IfButtonOp.Op2 -> {

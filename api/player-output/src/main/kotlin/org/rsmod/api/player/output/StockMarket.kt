@@ -17,7 +17,7 @@ public object StockMarket {
     /** Low three bits of the status: the state of the offer. */
     public const val STATE_PENDING: Int = 1
     public const val STATE_OPEN: Int = 2
-    public const val STATE_COMPLETED: Int = 4
+    public const val STATE_COMPLETED: Int = 5
     public const val STATE_ABORTED: Int = 5
 
     /** Bit set on the status of a sell offer. */

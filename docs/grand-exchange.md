@@ -122,6 +122,17 @@ the clientscript arithmetic) and writes the result back.
 | `UpdateStockMarketSlotV2` | `stockmarket_*` clientscript state per slot | on login, open and every change |
 | invs `tradingpost_sell_0..5`, `ge_collect_6/7` | collection boxes | inventory transmit |
 
+Long varps (the price, the per-slot fee and item sink prices) need a build-time fix. The CS2
+compiler emits `push_var` / `pop_var` for every varp, but the client reads and writes long varps
+with `push_var_long` / `pop_var_long` (opcodes 64 / 65). Left as compiled, any script touching one
+aborts on an empty long stack, which blanks the setup price, total and Confirm label and the fee
+line of the status view. `or-cache`'s `LongVarpPatch` task runs after `PackCs2` in `buildCache` and
+rewrites those opcodes in the packed scripts, using the `long` entries in `symbols/varp.sym`.
+
+The status byte of an `UpdateStockMarketSlotV2` packs the state in its low 3 bits and a sell flag
+in bit 3. The scripts only distinguish 0 (empty), 1 (pending), 2 (in progress) and 5 (finished), so
+completed and aborted offers are both sent as 5; any other value reads as an offer still running.
+
 The op protocol (comsub = the child index the clientscripts create with `cc_create`):
 
 - `ge_offers:index_N` child 2: op1 view, op2 abort, op3 modify. Child 3 op1: create buy offer

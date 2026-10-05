@@ -16,6 +16,7 @@ import dev.openrune.cache.tools.incremental.CacheVerification
 import dev.openrune.cache.tools.incremental.IncrementalSession
 import dev.openrune.cache.tools.tasks.CacheTask
 import dev.openrune.cache.tools.tasks.TaskType
+import dev.openrune.cs2.LongVarpPatch
 import dev.openrune.codegen.startEnumGeneration
 import dev.openrune.codegen.startGeneration
 import dev.openrune.definition.GameValGroupTypes
@@ -252,7 +253,10 @@ private fun newCacheTool(type: TaskType, packTasks: List<CacheTask>): CacheTool 
 
         progress = CombinedProgress()
 
-        tasks { packTasks.forEach { +it } }
+        tasks {
+            packTasks.forEach { +it }
+            if (type == TaskType.BUILD) +LongVarpPatch()
+        }
     }
 }
 

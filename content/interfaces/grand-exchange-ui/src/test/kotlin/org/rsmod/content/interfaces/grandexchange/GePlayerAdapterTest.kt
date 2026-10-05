@@ -462,6 +462,40 @@ class GePlayerAdapterTest {
     }
 
     @Test
+    fun `finished offers are reported in the one state the status scripts call finished`() {
+        val buyer = player(41)
+        buyer.inv[0] = InvObj("obj.coins", 10_000_000)
+        sessions.login(buyer)
+        exchange.place(sessions.of(buyer), 0, OfferType.BUY, whip, 1, 3_100_000)
+        val bought = buyer.written.filterIsInstance<UpdateStockMarketSlotV2>().last { it.slot == 0 }
+        assertEquals(OfferState.COMPLETED, sessions.of(buyer).slot(0).state)
+        assertEquals(5, (bought.update as UpdateStockMarketSlotV2.SetStockMarketSlot).status)
+
+        val seller = player(42)
+        seller.inv[0] = InvObj("obj.abyssal_whip", 1)
+        sessions.login(seller)
+        exchange.place(sessions.of(seller), 0, OfferType.SELL, whip, 1, 2_800_000)
+        val sold = seller.written.filterIsInstance<UpdateStockMarketSlotV2>().last { it.slot == 0 }
+        assertEquals(OfferState.COMPLETED, sessions.of(seller).slot(0).state)
+        assertEquals(5 or 8, (sold.update as UpdateStockMarketSlotV2.SetStockMarketSlot).status)
+    }
+
+    @Test
+    fun `server side price and quantity changes redraw the setup panel`() {
+        val p = player(43)
+        setup.begin(p, 0, OfferType.BUY)
+        setup.selectItem(p, catalog.resolve(whip)!!.id, 1, null)
+        val before = p.written.size
+        setup.setPrice(p, 3_300_000)
+        setup.refreshPanel(p)
+
+        val after = p.written.drop(before)
+        val price = after.filterIsInstance<VarpLong>().single { it.id == 5753 }
+        assertEquals(3_300_000L, price.value)
+        assertTrue(after.indexOf(price) < after.indexOfFirst { it is RunClientScript && it.id == 5306 })
+    }
+
+    @Test
     fun `choosing an item sends the price as a long and refreshes the panel`() {
         val p = player(31)
         setup.begin(p, 2, OfferType.BUY)
