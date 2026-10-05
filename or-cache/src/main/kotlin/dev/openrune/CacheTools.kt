@@ -86,7 +86,25 @@ fun main(args: Array<String>) {
     CacheVarLiteral.registerExternal(253, '[', name = "PROJANIM")
     CacheVarLiteral.registerExternal(254, ']', name = "VARBIT")
 
-    downloadRev(TaskType.valueOf(args.first().uppercase()))
+    withBuildLock { downloadRev(TaskType.valueOf(args.first().uppercase())) }
+}
+
+/**
+ * Cache builds must not overlap: two at once (e.g. the hot-reload watcher's and a manual one, or
+ * one per worktree, which share the CS2 output folder) corrupt the pack state and delete each
+ * other's generated sources. A machine-wide file lock makes a second build wait its turn.
+ */
+private fun <T> withBuildLock(block: () -> T): T {
+    val lockFile = File(System.getProperty("java.io.tmpdir"), "openrune-buildcache.lock")
+    java.io.RandomAccessFile(lockFile, "rw").channel.use { channel ->
+        val lock =
+            channel.tryLock()
+                ?: run {
+                    logger.info { "Another cache build is running; waiting for it to finish..." }
+                    channel.lock()
+                }
+        return lock.use { block() }
+    }
 }
 
 fun downloadRev(type: TaskType) {
