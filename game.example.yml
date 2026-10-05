@@ -17,6 +17,19 @@ gameplay:
     mode: "assume-completed"
     virtual-completions: []
     virtual-lines: []
+  # Grand Exchange: players trade against each other first, then a simulated market priced from the
+  # OSRS Wiki real-time prices. Read at startup; see docs/grand-exchange.md.
+  grand-exchange:
+    enabled: true
+    fill-model: instant              # instant (offers at or through the market price fill at once)
+    prices:
+      live: true                     # false = never touch the network, use the stored snapshot only
+      refresh-minutes: 5             # background refresh; the wiki asks not to be hammered
+      snapshot-path: ".data/ge/prices.json"
+      user-agent: "OpenRune-Server GE price feed (private server) - github.com/OpenRune"
+    tax:
+      rate: 0.02                     # convenience fee on sells, per item, rounded down
+      cap: 5000000                   # maximum fee per item
 
 central:
   same-instance: true
