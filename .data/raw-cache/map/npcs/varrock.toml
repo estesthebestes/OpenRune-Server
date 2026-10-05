@@ -55,10 +55,6 @@ npc = "npc.bond_james_bond"
 coords = "0_49_54_34_5"
 
 [[spawn]]
-npc = "npc.bond_james_visible"
-coords = "0_49_54_34_5"
-
-[[spawn]]
 npc = "npc.brownbear"
 coords = "0_50_54_30_44"
 

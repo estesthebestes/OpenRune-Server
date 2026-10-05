@@ -55,4 +55,13 @@ class GeNpcWiringTest {
             }
         assertEquals(1, injectable.size)
     }
+
+    @Test
+    fun `James is spawned once, as the base npc that switches to his visible form`() {
+        val spawns =
+            java.io.File(".data/raw-cache/map/npcs/varrock.toml")
+                .readLines()
+                .filter { it.contains("bond_james") }
+        assertEquals(listOf("""npc = "npc.bond_james_bond""""), spawns.map { it.trim() })
+    }
 }
