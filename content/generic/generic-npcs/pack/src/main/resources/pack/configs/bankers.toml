@@ -1,9 +1,11 @@
 [[npc]]
 id = "npc.banker1"
 inherit = "npc.banker1"
+contentGroup = "content.banker"
 moveRestrict = "NoMove"
 
 [[npc]]
 id = "npc.banker2"
 inherit = "npc.banker2"
+contentGroup = "content.banker"
 moveRestrict = "NoMove"

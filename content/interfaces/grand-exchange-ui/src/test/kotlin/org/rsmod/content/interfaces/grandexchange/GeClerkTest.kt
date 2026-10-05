@@ -29,6 +29,9 @@ import org.rsmod.api.invtx.InvTransactionsScript
 import org.rsmod.api.player.dialogue.align.TextAlignment
 import org.rsmod.api.player.input.ResumePauseButtonInput
 import org.rsmod.api.player.ironman.PlayerGamemode
+import org.rsmod.api.player.events.interact.NpcEvents
+import org.rsmod.api.player.interact.NpcInteractions
+import org.rsmod.game.interact.InteractionOp
 import org.rsmod.api.player.protect.ProtectedAccess
 import org.rsmod.api.player.protect.ProtectedAccessContextFactory
 import org.rsmod.api.player.protect.clearPendingAction
@@ -136,7 +139,7 @@ class GeClerkTest {
             fail<Unit>("clerk dialogue did not settle")
         }
 
-        private fun start(block: suspend ProtectedAccess.() -> Unit) {
+        fun start(block: suspend ProtectedAccess.() -> Unit) {
             player.clearPendingAction(events)
             result = null
             player.activeCoroutine = coroutine
@@ -176,6 +179,53 @@ class GeClerkTest {
             }
             result?.getOrThrow()
         }
+    }
+
+    private val clerkIds = listOf("npc.ge_clerk_1", "npc.ge_clerk_2", "npc.ge_clerk_3", "npc.ge_clerk_4")
+
+    private fun Scene.withEntryScript() {
+        val script = GeEntryScript(exchange, sessions, windows, GePrices(null, null, { null }))
+        with(script) { ScriptContext(events, CheatCommandMap(), EngineQueueCache()).startup() }
+    }
+
+    @Test
+    fun `every clerk can be used from across the desk for every option`() {
+        val s = Scene()
+        s.withEntryScript()
+        val interactions = NpcInteractions(s.events)
+        for (id in clerkIds) {
+            val npc = Npc(id, CoordGrid(3164, 3488, 0))
+            for (op in listOf(InteractionOp.Op1, InteractionOp.Op3, InteractionOp.Op4, InteractionOp.Op5)) {
+                assertTrue(interactions.hasApTrigger(s.player, npc, op), "$id $op ap")
+                assertTrue(interactions.hasOpTrigger(s.player, npc, op), "$id $op op")
+            }
+        }
+    }
+
+    @Test
+    fun `the Sets option of every clerk opens the item set window from range and from beside`() {
+        for (id in clerkIds) {
+            for (ap in listOf(true, false)) {
+                val s = Scene()
+                s.withEntryScript()
+                val npc = Npc(id, CoordGrid(3165, 3487, 0))
+                s.start {
+                    val event = if (ap) NpcEvents.Ap5(npc) else NpcEvents.Op5(npc)
+                    assertTrue(s.events.publish(this, event), "$id ap=$ap")
+                }
+                assertTrue(s.player.ui.containsModal("interface.itemsets"), "$id ap=$ap")
+                assertTrue(s.player.ui.containsModal("interface.itemsets_side"), "$id ap=$ap")
+            }
+        }
+    }
+
+    @Test
+    fun `talking to a clerk from range starts the dialogue`() {
+        val s = Scene()
+        s.withEntryScript()
+        val npc = Npc("npc.ge_clerk_3", CoordGrid(3165, 3487, 0))
+        s.start { assertTrue(s.events.publish(this, NpcEvents.Ap1(npc))) }
+        assertTrue(s.said("Welcome to the Grand Exchange"))
     }
 
     @Test

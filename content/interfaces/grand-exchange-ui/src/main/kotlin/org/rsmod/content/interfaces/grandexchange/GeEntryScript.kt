@@ -5,8 +5,10 @@ import org.rsmod.api.game.process.GameLifecycle
 import org.rsmod.api.grandexchange.engine.GrandExchange
 import org.rsmod.api.grandexchange.price.GePrices
 import org.rsmod.api.player.protect.ProtectedAccess
+import org.rsmod.api.script.onApNpc1
 import org.rsmod.api.script.onApNpc3
 import org.rsmod.api.script.onApNpc4
+import org.rsmod.api.script.onApNpc5
 import org.rsmod.api.script.onEvent
 import org.rsmod.api.script.onOpLoc1
 import org.rsmod.api.script.onOpLoc3
@@ -47,11 +49,13 @@ constructor(
         onEvent<GameLifecycle.LateCycle> { sweep() }
 
         for (clerk in CLERKS) {
-            onOpNpc1(clerk) { startDialogue(it.npc) { clerks.greet(this) } }
+            onApNpc1(clerk) { approach(it.npc) { talk(it.npc) } }
+            onOpNpc1(clerk) { talk(it.npc) }
             onApNpc3(clerk) { approach(it.npc) { windows.openExchange(this) } }
             onOpNpc3(clerk) { windows.openExchange(this) }
             onApNpc4(clerk) { approach(it.npc) { windows.openHistory(this) } }
             onOpNpc4(clerk) { windows.openHistory(this) }
+            onApNpc5(clerk) { approach(it.npc) { itemSets.open(this) } }
             onOpNpc5(clerk) { itemSets.open(this) }
         }
 
@@ -59,6 +63,10 @@ constructor(
         for (booth in BOOTHS_WITH_COLLECT) {
             onOpLoc3(booth) { windows.openCollect(this) }
         }
+    }
+
+    private suspend fun ProtectedAccess.talk(npc: Npc) {
+        startDialogue(npc) { clerks.greet(this) }
     }
 
     private fun sweep() {

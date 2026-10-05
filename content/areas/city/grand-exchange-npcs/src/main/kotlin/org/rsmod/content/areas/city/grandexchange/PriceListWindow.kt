@@ -6,6 +6,7 @@ import dev.openrune.rscm.RSCMType
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import org.rsmod.api.market.MarketPrices
+import org.rsmod.api.player.output.UpdateInventory
 import org.rsmod.api.player.output.objExamine
 import org.rsmod.api.player.output.runClientScript
 import org.rsmod.api.player.protect.ProtectedAccess
@@ -17,7 +18,8 @@ import org.rsmod.game.type.getInvObj
 
 /**
  * Shows a market guide through the stock `ge_pricelist` window: the client draws one card per
- * object in the transmitted inventory and reads the stack count as the price.
+ * object in the transmitted inventory and reads the stack count as the price. The inventory is sent
+ * before the window opens so the client already holds the items when its init script runs.
  */
 @Singleton
 internal class PriceListWindow @Inject constructor(private val prices: MarketPrices) {
@@ -27,8 +29,9 @@ internal class PriceListWindow @Inject constructor(private val prices: MarketPri
         for ((slot, type) in guide.types.withIndex()) {
             inv[slot] = InvObj(type, prices[type]?.coerceAtLeast(1) ?: type.cost.coerceAtLeast(1))
         }
-        access.ifOpenMainModal(INTERFACE)
         access.invTransmit(inv)
+        UpdateInventory.updateInvFull(access.player, inv)
+        access.ifOpenMainModal(INTERFACE)
         access.ifSetEvents(LIST, guide.types.indices, IfEvent.Op10)
         access.player.runClientScript(INIT.asRSCM(RSCMType.CLIENTSCRIPT), inv.type.id, guide.title)
     }
@@ -51,7 +54,7 @@ internal class PriceListWindow @Inject constructor(private val prices: MarketPri
     companion object {
         const val INTERFACE = "interface.ge_pricelist"
         const val LIST = "component.ge_pricelist:list"
-        const val INV = "inv.ge_pricelist"
+        const val INV = "inv.inv_group_temp"
         const val INIT = "clientscript.[clientscript,ge_pricelist]"
     }
 }

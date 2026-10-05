@@ -1,6 +1,10 @@
+# The price lists reuse a cache inventory the client already knows the size of (inv_size reads the
+# client cache, so a custom inventory would draw nothing until every client refreshed its cache).
+
 [[inventory]]
-id = "inv.ge_pricelist"
-size = 100
+isServerOnly = true
+id = "inv.inv_group_temp"
+inherit = "inv.inv_group_temp"
 scope = "Temp"
 stack = "Always"
 protect = false

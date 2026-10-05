@@ -1,9 +1,17 @@
 package org.rsmod.content.areas.city.grandexchange
 
 import dev.openrune.ServerCacheManager
+import dev.openrune.OsrsCacheProvider
+import dev.openrune.definition.type.InventoryType
+import dev.openrune.filesystem.Cache
 import dev.openrune.rscm.RSCM.asRSCM
+import dev.openrune.rscm.RSCMType
+import dev.openrune.types.InvScope
+import dev.openrune.types.InvStackType
+import java.nio.file.Path
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
@@ -12,6 +20,9 @@ import org.junit.jupiter.api.parallel.Execution
 import org.junit.jupiter.api.parallel.ExecutionMode
 import org.junit.jupiter.api.parallel.ResourceLock
 import org.rsmod.api.npc.events.AiTimerEvents
+import org.rsmod.api.player.interact.NpcInteractions
+import org.rsmod.events.EventBus
+import org.rsmod.game.entity.Player
 import org.rsmod.game.entity.Npc
 import org.rsmod.map.CoordGrid
 
@@ -39,11 +50,28 @@ class MarketGuideTest {
 
     @Test
     fun `no guide repeats an item and every guide fits the price list inventory`() {
-        val capacity = checkNotNull(ServerCacheManager.getInventory("inv.ge_pricelist".asRSCM())).size
+        val capacity =
+            checkNotNull(ServerCacheManager.getInventory(PriceListWindow.INV.asRSCM(RSCMType.INV))).size
         for (guide in PriceGuide.entries) {
             assertEquals(guide.items.size, guide.items.toSet().size, guide.title)
             assertTrue(guide.items.size <= capacity, guide.title)
         }
+    }
+
+    @Test
+    fun `the client cache knows the price list inventory at a size that holds the longest guide`() {
+        val inventories = mutableMapOf<Int, InventoryType>()
+        OsrsCacheProvider.InventoryDecoder().load(Cache.load(Path.of(".data/cache/LIVE")), inventories)
+        val client = checkNotNull(inventories[PriceListWindow.INV.asRSCM(RSCMType.INV)])
+        assertTrue(client.size >= PriceGuide.entries.maxOf { it.items.size }, "size ${client.size}")
+    }
+
+    @Test
+    fun `the price list inventory is a temporary stacking one the server may fill freely`() {
+        val server = checkNotNull(ServerCacheManager.getInventory(PriceListWindow.INV.asRSCM(RSCMType.INV)))
+        assertEquals(InvScope.Temp, server.scope)
+        assertEquals(InvStackType.Always, server.stack)
+        assertFalse(server.protect)
     }
 
     @Test
@@ -69,7 +97,7 @@ class MarketGuideTest {
             f.op(npc, 3)
             f.finish()
             assertTrue(f.player.ui.containsModal("interface.ge_pricelist"), npc)
-            val inv = f.player.invMap["inv.ge_pricelist"]
+            val inv = f.player.invMap["inv.inv_group_temp"]
             assertNotNull(inv, npc)
             val shown = inv!!.objs.filterNotNull()
             assertEquals(guide.types.map { it.id }, shown.map { it.id }, npc)
@@ -82,7 +110,7 @@ class MarketGuideTest {
         val f = GeNpcFixture(priceOf = { null })
         f.op("npc.ge_expert_ores", 3)
         f.finish()
-        val shown = checkNotNull(f.player.invMap["inv.ge_pricelist"]).objs.filterNotNull()
+        val shown = checkNotNull(f.player.invMap["inv.inv_group_temp"]).objs.filterNotNull()
         val copper = shown.first { it.id == "obj.copper_ore".asRSCM() }
         assertEquals(checkNotNull(ServerCacheManager.getItem(copper.id)).cost.coerceAtLeast(1), copper.count)
         assertTrue(shown.all { it.count >= 1 })
@@ -95,7 +123,7 @@ class MarketGuideTest {
         f.finish()
         f.op("npc.ge_expert_logs", 3)
         f.finish()
-        val shown = checkNotNull(f.player.invMap["inv.ge_pricelist"]).objs.filterNotNull()
+        val shown = checkNotNull(f.player.invMap["inv.inv_group_temp"]).objs.filterNotNull()
         assertEquals(PriceGuide.Logs.types.size, shown.size)
     }
 
@@ -115,7 +143,7 @@ class MarketGuideTest {
         f.op("npc.ge_expert_runes", 3)
         f.finish()
         f.window.close(f.player)
-        assertTrue(checkNotNull(f.player.invMap["inv.ge_pricelist"]).isEmpty())
+        assertTrue(checkNotNull(f.player.invMap["inv.inv_group_temp"]).isEmpty())
     }
 
     @Test
@@ -163,14 +191,28 @@ class MarketGuideTest {
     }
 
     @Test
-    fun `the three banker models at the exchange are generic bankers`() {
-        for (name in listOf("npc.banker1_east", "npc.banker1_west", "npc.banker2_east")) {
+    fun `all four bankers at the exchange resolve to a generic banker`() {
+        val interactions = NpcInteractions(EventBus())
+        for (name in
+            listOf(
+                "npc.banker1_east",
+                "npc.banker1_west",
+                "npc.banker2_east",
+                "npc.deadman_banker_grey_west",
+            )) {
+            val spawned = checkNotNull(ServerCacheManager.getNpc(name.asRSCM()))
+            assertEquals(0, spawned.wanderRange, name)
+            val shown = interactions.multiNpc(spawned, Player().vars) ?: spawned
+            assertTrue(shown.isContentType("content.banker"), "$name shows as ${shown.internalName}")
+        }
+    }
+
+    @Test
+    fun `the plain banker models carry the banker group`() {
+        for (name in listOf("npc.banker1", "npc.banker2")) {
             val type = checkNotNull(ServerCacheManager.getNpc(name.asRSCM()))
             assertTrue(type.isContentType("content.banker"), name)
-            assertEquals(0, type.wanderRange, name)
         }
-        val deadmanVariant = checkNotNull(ServerCacheManager.getNpc("npc.deadman_banker_grey_west".asRSCM()))
-        assertEquals(0, deadmanVariant.wanderRange)
     }
 
     companion object {
