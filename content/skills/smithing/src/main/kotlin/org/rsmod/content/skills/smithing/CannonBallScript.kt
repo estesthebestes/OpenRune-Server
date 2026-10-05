@@ -6,6 +6,7 @@ import org.rsmod.api.script.onOpHeldU
 import org.rsmod.api.script.onOpLocCategoryU
 import org.rsmod.api.script.onPlayerQueueWithArgs
 import org.rsmod.api.table.smithing.SmithingCannonBallsRow
+import org.rsmod.content.quest.manager.QuestRequirements
 import org.rsmod.content.skills.Material
 import org.rsmod.content.skills.SkillMultiConfig
 import org.rsmod.content.skills.SkillMultiEntry
@@ -23,7 +24,7 @@ class CannonBallScript : PluginScript() {
     override fun ScriptContext.startup() {
         allCannonBalls.forEach { ball ->
             onOpLocCategoryU("category.furnace", ball.input.internalName) {
-                if (hasAmmoMould()) {
+                if (hasAmmoMould() && knowsCannonballs()) {
                     startSmelting(it, ball)
                 }
             }
@@ -174,11 +175,25 @@ class CannonBallScript : PluginScript() {
 
 private val cannonballMoulds = arrayOf("obj.ammo_mould", "obj.double_ammo_mould")
 
+/** Nulodion's ammo mould is only any use once Dwarf Cannon has taught the player how. */
+internal fun ProtectedAccess.knowsCannonballs(): Boolean {
+    if (QuestRequirements.hasCompleted(player, DWARF_CANNON)) {
+        return true
+    }
+    mes("You need to complete the Dwarf Cannon quest to make cannonballs.")
+    return false
+}
+
+private const val DWARF_CANNON = "quest_dwarfcannon"
+
 internal fun ProtectedAccess.hasCannonballFurnaceMould(): Boolean =
     cannonballMoulds.any(inv::contains)
 
 /** @return `true` if a cannonball smelt menu was opened. */
 internal suspend fun ProtectedAccess.openCannonballFurnaceMenu(locInternal: String): Boolean {
+    if (!knowsCannonballs()) {
+        return true
+    }
     val allCannonBalls = SmithingCannonBallsRow.all()
     val available = allCannonBalls.filter { inv.contains(it.input.internalName) }
     if (available.isEmpty()) {

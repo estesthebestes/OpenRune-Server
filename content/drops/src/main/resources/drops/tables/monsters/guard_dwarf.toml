@@ -1,0 +1,6 @@
+id = "Guard (dwarf) Drops"
+npcs = ["npc.mcannonguard", "npc.mcannonguard1", "npc.mcannonguard2", "npc.mcannonguard3", "npc.mcannonguard4"]
+
+[[guaranteed]]
+obj = "obj.bones"
+count = 1

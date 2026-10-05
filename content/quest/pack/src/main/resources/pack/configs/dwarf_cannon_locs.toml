@@ -1,0 +1,53 @@
+[[object]]
+id = "loc.mcannon_dwarf_railing_gate_mir"
+inherit = "loc.mcannon_dwarf_railing_gate_mir"
+contentGroup = "content.closed_left_picketgate"
+
+[object.params]
+"param.next_loc_stage" = "loc.mcannon_dwarf_railing_gate_mir_inact"
+"param.opensound" = "synth.picketgate_open"
+
+[[object]]
+id = "loc.mcannon_dwarf_railing_gate_mir_inact"
+inherit = "loc.mcannon_dwarf_railing_gate_mir_inact"
+contentGroup = "content.opened_left_picketgate"
+
+[object.params]
+"param.next_loc_stage" = "loc.mcannon_dwarf_railing_gate_mir"
+"param.closesound" = "synth.picketgate_close"
+
+[[object]]
+id = "loc.mcannon_dwarf_railing_gate"
+inherit = "loc.mcannon_dwarf_railing_gate"
+contentGroup = "content.closed_right_picketgate"
+
+[object.params]
+"param.next_loc_stage" = "loc.mcannon_dwarf_railing_gate_inact"
+"param.opensound" = "synth.picketgate_open"
+
+[[object]]
+id = "loc.mcannon_dwarf_railing_gate_inact"
+inherit = "loc.mcannon_dwarf_railing_gate_inact"
+contentGroup = "content.opened_right_picketgate"
+
+[object.params]
+"param.next_loc_stage" = "loc.mcannon_dwarf_railing_gate"
+"param.closesound" = "synth.picketgate_close"
+
+[[object]]
+id = "loc.mcannondoor"
+inherit = "loc.mcannondoor"
+contentGroup = "content.closed_single_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.mcannondoor1"
+"param.opensound" = "synth.nicedoor_open"
+
+[[object]]
+id = "loc.mcannondoor1"
+inherit = "loc.mcannondoor1"
+contentGroup = "content.opened_single_door"
+
+[object.params]
+"param.next_loc_stage" = "loc.mcannondoor"
+"param.closesound" = "synth.nicedoor_close"

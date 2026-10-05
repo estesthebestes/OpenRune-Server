@@ -1,0 +1,19 @@
+[[varbit]]
+isServerOnly = true
+id = "varbit.dwarf_cannon_progress"
+varp = "varp.mcannon"
+startBit = 0
+endBit = 3
+
+[[varp]]
+isServerOnly = true
+id = "varp.dwarf_cannon_state"
+scope = "Perm"
+transmit = "Never"
+
+[[varbit]]
+isServerOnly = true
+id = "varbit.dwarf_cannon_ornate"
+varp = "varp.dwarf_cannon_state"
+startBit = 0
+endBit = 0

@@ -16288,3 +16288,9 @@ defaultMode = "None"
 id = "npc.leviathan_tail_ring_3"
 inherit = "npc.leviathan_tail_ring_3"
 defaultMode = "None"
+
+# Captain Lawgof barks orders at his troops between visitors (see CaptainLawgof).
+[[npc]]
+id = "npc.lawgof2"
+inherit = "npc.lawgof2"
+timer = 1
