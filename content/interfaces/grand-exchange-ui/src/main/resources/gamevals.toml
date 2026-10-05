@@ -1,0 +1,44 @@
+# 64132 is taken by varp.barrows_state, so the slot stream skips it.
+[gamevals.varp]
+ge_slots_0 = 64100
+ge_slots_1 = 64101
+ge_slots_2 = 64102
+ge_slots_3 = 64103
+ge_slots_4 = 64104
+ge_slots_5 = 64105
+ge_slots_6 = 64106
+ge_slots_7 = 64107
+ge_slots_8 = 64108
+ge_slots_9 = 64109
+ge_slots_10 = 64110
+ge_slots_11 = 64111
+ge_slots_12 = 64112
+ge_slots_13 = 64113
+ge_slots_14 = 64114
+ge_slots_15 = 64115
+ge_slots_16 = 64116
+ge_slots_17 = 64117
+ge_slots_18 = 64118
+ge_slots_19 = 64119
+ge_slots_20 = 64120
+ge_slots_21 = 64121
+ge_slots_22 = 64122
+ge_slots_23 = 64123
+ge_slots_24 = 64124
+ge_slots_25 = 64125
+ge_slots_26 = 64126
+ge_slots_27 = 64127
+ge_slots_28 = 64128
+ge_slots_29 = 64129
+ge_slots_30 = 64130
+ge_slots_31 = 64131
+ge_slots_32 = 64133
+ge_slots_33 = 64134
+ge_slots_34 = 64135
+ge_slots_35 = 64136
+ge_slots_36 = 64137
+ge_slots_37 = 64138
+ge_slots_38 = 64139
+
+[gamevals.inv]
+ge_history = 1102
